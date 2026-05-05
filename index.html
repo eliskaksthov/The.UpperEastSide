@@ -189,7 +189,7 @@
     .input-area { 
         position: fixed; bottom: 0; left: 0; right: 0; 
         background: rgba(0,0,0,0.9); border-top: 1px solid var(--border); 
-        padding: 15px; z-index: 101; backdrop-filter: blur(10px);
+        padding: 5px; z-index: 101; backdrop-filter: blur(10px);
     }
     .input-container { max-width: 500px; margin: auto; display: flex; flex-direction: column; gap: 8px; }
     
@@ -205,30 +205,7 @@
        Radio tlačítka ve spodní liště.
        ============================================= */
     .type-selector {
-        display: flex;
-        gap: 8px;
-    }
-    .type-btn {
-        flex: 1;
-        padding: 10px;
-        border-radius: 10px;
-        border: 1px solid var(--border);
-        background: var(--surface);
-        color: var(--muted);
-        cursor: pointer;
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 15px;
-        text-align: center;
-        transition: 0.2s;
-    }
-    .type-btn.selected-gossip { background: rgba(255,45,85,0.15); color: var(--accent); border-color: var(--accent); }
-    .type-btn.selected-praise { background: rgba(48,209,88,0.15); color: var(--accent-good); border-color: var(--accent-good); }
-
-    .post-btn { 
-        background: var(--accent); color: white; border: none; 
-        padding: 12px; border-radius: 10px; font-family: 'Bebas Neue', sans-serif; 
-        cursor: pointer; font-size: 18px; letter-spacing: 1px;
-    }
+     
 
     /* =============================================
        ANIMACE FADEIN
@@ -257,11 +234,11 @@
      ============================================= -->
 
 <div class="menu" id="navMenu">
-    <button onclick="showSection('feed')">📱 DRBY</button>
-    <button onclick="showSection('ranking')">🏆 RANKING</button>
-    <button id="loginBtn" onclick="showSection('login')">🔑 PŘIHLÁŠENÍ</button>
-    <button class="admin-only" onclick="showSection('admin')">⚙️ ADMIN PANEL</button>
-    <button class="admin-only" onclick="logout()" style="color: var(--accent);">🚪 ODHLÁSIT</button>
+    <button onclick="showSection('feed')">DRBY</button>
+    <button onclick="showSection('ranking')">RANKING</button>
+    <button id="loginBtn" onclick="showSection('login')">PŘIHLÁŠENÍ</button>
+    <button class="admin-only" onclick="showSection('admin')">ADMIN PANEL</button>
+    <button class="admin-only" onclick="logout()" style="color: var(--accent);">ODHLÁSIT</button>
 </div>
 
 <!-- =============================================
@@ -278,9 +255,9 @@
 
 <!-- RANKING — 5 lidí podle skóre (pochvaly - pomluvy) -->
 <div id="ranking" class="section">
-    <div class="ranking-title">🏆 HALL OF FAME & SHAME</div>
+    <div class="ranking-title">HALL OF FAME & SHAME</div>
     <p style="color: var(--muted); font-size: 13px; margin-bottom: 20px;">
-        Skóre = ❤️ za pochvaly − ❤️ za pomluvy
+        
     </p>
     <div id="rankingList"></div>
 </div>
@@ -314,17 +291,9 @@
      Zobrazí se jen ve feedu.
      ============================================= -->
 
-<div class="input-area" id="inputArea">
-    <div class="input-container">
-        <input type="text" id="personInput" placeholder="O kom to je?">
-        <input type="text" id="gossipInput" placeholder="Co se stalo?">
-
+<
 ```
-    <!-- Výběr: je to pomluva nebo pochvala? -->
-    <div class="type-selector">
-        <button class="type-btn selected-gossip" id="btnGossip" onclick="selectType('gossip')">💀 POMLUVA</button>
-        <button class="type-btn" id="btnPraise" onclick="selectType('praise')">✨ POCHVALA</button>
-    </div>
+    <
 
     <div style="display: flex; gap: 10px;">
         <label style="background:var(--surface); padding:12px; border-radius:10px; cursor:pointer; flex:1; text-align:center; border:1px solid var(--border); font-size: 14px;" id="photoLabel">
