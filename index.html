@@ -1,187 +1,143 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>THE LIST</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-
-<style>
-:root {
-  --bg: #080808;
-  --surface: #111111;
-  --surface2: #1a1a1a;
-  --accent: #ff2d55;
-  --accent2: #ff6b6b;
-  --text: #ffffff;
-  --muted: #555;
-  --border: #222;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
-
-.header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(8,8,8,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
-.logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 4px; background: linear-gradient(135deg, #fff 0%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.hamburger { display: flex; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
-.hamburger span { display: block; width: 24px; height: 2px; background: white; transition: all 0.3s ease; }
-
-.menu-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 99; background: rgba(0,0,0,0.97); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.77,0,0.175,1); }
-.menu-overlay.open { transform: translateX(0); }
-.menu-item { font-family: 'Bebas Neue', sans-serif; font-size: 52px; letter-spacing: 6px; color: var(--muted); cursor: pointer; padding: 8px 40px; }
-.menu-item.active { color: white; }
-
-.content { padding-top: 75px; padding-bottom: 30px; max-width: 480px; margin: auto; padding-left: 20px; padding-right: 20px; }
-.page { display: none; animation: fadeUp 0.4s ease; }
-.page.active { display: block; }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-
-.section-title { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 3px; margin: 24px 0 16px; color: white; }
-.section-title span { color: var(--accent); }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; }
-.rank-card { display: flex; align-items: center; gap: 14px; }
-.rank-num { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--muted); min-width: 36px; }
-.rank-num.top { color: var(--accent); }
-.rank-score { font-size: 12px; color: var(--muted); background: var(--surface2); padding: 4px 10px; border-radius: 20px; }
-
-.input-area { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(8,8,8,0.97); backdrop-filter: blur(20px); border-top: 1px solid var(--border); padding: 12px 20px 28px; display: none; }
-.input-area.visible { display: block; }
-.input-row { display: flex; gap: 10px; max-width: 480px; margin: auto; }
-.input-row input { flex: 1; background: var(--surface); border: 1px solid var(--border); color: white; padding: 12px 16px; border-radius: 12px; }
-.post-btn { background: var(--accent); color: white; border: none; padding: 12px 20px; border-radius: 12px; font-family: 'Bebas Neue', sans-serif; cursor: pointer; }
-
-.live-dot { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: #4caf50; margin-bottom: 4px; }
-.live-dot::before { content: ''; width: 7px; height: 7px; background: #4caf50; border-radius: 50%; animation: pulse 1.5s infinite; }
-@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-.featured { background: linear-gradient(135deg, #1a0a0d, #1a1a1a); border: 1px solid rgba(255,45,85,0.3); border-radius: 18px; padding: 20px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>THE LIST</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #080808; --surface: #111111; --accent: #ff2d55; --text: #ffffff; --muted: #555; --border: #222; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 100px; }
+        
+        .header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(8,8,8,0.9); backdrop-filter: blur(15px); border-bottom: 1px solid var(--border); padding: 15px 20px; text-align: center; }
+        .logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 4px; color: var(--accent); }
+        
+        .content { padding: 80px 20px 20px; max-width: 500px; margin: auto; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 15px; padding: 15px; margin-bottom: 15px; animation: fadeIn 0.5s ease; }
+        .gossip-img { width: 100%; border-radius: 10px; margin-top: 10px; display: block; }
+        
+        .input-area { position: fixed; bottom: 0; left: 0; right: 0; background: #000; border-top: 1px solid var(--border); padding: 15px; z-index: 101; }
+        .input-container { max-width: 500px; margin: auto; display: flex; gap: 10px; align-items: center; }
+        input[type="text"] { flex: 1; background: var(--surface); border: 1px solid var(--border); color: white; padding: 12px; border-radius: 10px; outline: none; }
+        .post-btn { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 10px; font-family: 'Bebas Neue', sans-serif; cursor: pointer; transition: 0.2s; }
+        .post-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        #preview { display: none; width: 40px; height: 40px; border-radius: 5px; object-fit: cover; border: 1px solid var(--accent); }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="logo">THE LIST</div>
-  <div class="hamburger" id="hamburger" onclick="toggleMenu()">
-    <span></span><span></span><span></span>
-  </div>
-</div>
+<div class="header"><div class="logo">THE LIST</div></div>
+<div class="content" id="gossipFeed">Načítám drby...</div>
 
-<div class="menu-overlay" id="menuOverlay">
-  <div class="menu-item active" id="menu-home" onclick="goTo('home')">HOME</div>
-  <div class="menu-item" id="menu-ranking" onclick="goTo('ranking')">RANKING</div>
-  <div class="menu-item" id="menu-gossip" onclick="goTo('gossip')">GOSSIP</div>
-</div>
-
-<div class="content">
-  <div class="page active" id="homePage">
-    <div class="section-title">LATEST <span>DROP</span></div>
-    <div class="live-dot">LIVE</div>
-    <div id="featuredGossip"><div class="empty">Načítám...</div></div>
-    <div class="section-title" style="margin-top:32px">TOP <span>3</span></div>
-    <div id="homeRanking"></div>
-  </div>
-
-  <div class="page" id="rankingPage">
-    <div class="section-title">THE <span>RANKING</span></div>
-    <div id="fullRanking"></div>
-  </div>
-
-  <div class="page" id="gossipPage">
-    <div class="section-title">ALL <span>GOSSIP</span></div>
-    <div class="live-dot">LIVE FEED</div>
-    <div id="gossipFeed"></div>
-  </div>
-</div>
-
-<div class="input-area" id="inputArea">
-  <div class="input-row">
-    <input id="gossipInput" placeholder="Napiš drb..." maxlength="200">
-    <button class="post-btn" onclick="postGossip()">POST</button>
-  </div>
+<div class="input-area">
+    <div class="input-container">
+        <label style="cursor:pointer; font-size: 20px;" title="Přidat fotku">
+            📷 <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="showPreview()">
+        </label>
+        <img id="preview">
+        <input type="text" id="gossipInput" placeholder="Napiš anonymní drb...">
+        <button class="post-btn" id="postBtn">POST</button>
+    </div>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// ÚDAJE Z TVÉHO SCREENSHOTU:
-const firebaseConfig = {
-  apiKey: "AIzaSyAc39Rt5BRBb7ijeYvcmOSx_AdyigvKNkk",
-  authDomain: "the-list-1efde.firebaseapp.com",
-  databaseURL: "https://the-list-1efde-default-rtdb.europe-west1.firebasedatabase.app", 
-  projectId: "the-list-1efde",
-  storageBucket: "the-list-1efde.firebasestorage.app",
-  messagingSenderId: "1093607046981",
-  appId: "1:1093607046981:web:fd32032936e10f9c51082c",
-  measurementId: "G-BT1B8DR2W7"
-};
+    // TVOJE KONFIGURACE (Zkontrolováno podle screenshotu)
+    const firebaseConfig = {
+        apiKey: "AIzaSyAc39Rt5BRBb7ijeYvcmOSx_AdyigvKNkk",
+        authDomain: "the-list-1efde.firebaseapp.com",
+        projectId: "the-list-1efde",
+        storageBucket: "the-list-1efde.firebasestorage.app",
+        messagingSenderId: "1093607046981",
+        appId: "1:1093607046981:web:fd32032936e10f9c51082c",
+        measurementId: "G-BT1B8DR2W7",
+        databaseURL: "https://the-list-1efde-default-rtdb.europe-west1.firebasedatabase.app"
+    };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const gossipRef = ref(db, 'gossip');
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const gossipRef = ref(db, 'gossip');
 
-let allGossip = [];
-let people = { "Lily": 0, "Mason": 0, "Chloe": 0, "Daniel": 0, "Alison": 0 };
-
-onValue(gossipRef, (snapshot) => {
-  allGossip = [];
-  // Reset skóre před přepočtem
-  for(let p in people) people[p] = 0;
-  
-  const data = snapshot.val();
-  if (data) {
-    Object.values(data).forEach(item => {
-      allGossip.push(item);
-      for (let name in people) {
-        if (item.text && item.text.toLowerCase().includes(name.toLowerCase())) {
-          people[name] += 1;
+    // Náhled vybrané fotky
+    window.showPreview = function() {
+        const file = document.getElementById('fileInput').files[0];
+        const preview = document.getElementById('preview');
+        if (file) {
+            preview.src = URL.createObjectURL(file);
+            preview.style.display = 'block';
         }
-      }
+    }
+
+    // ODESÍLÁNÍ DAT
+    document.getElementById('postBtn').onclick = async () => {
+        const textInput = document.getElementById('gossipInput');
+        const fileInput = document.getElementById('fileInput');
+        const btn = document.getElementById('postBtn');
+        
+        if (!textInput.value.trim() && !fileInput.files[0]) return;
+        
+        btn.disabled = true;
+        btn.innerText = "...";
+
+        let base64Image = "";
+        if (fileInput.files[0]) {
+            const file = fileInput.files[0];
+            // Převede obrázek na text, aby se dal uložit do databáze
+            base64Image = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        try {
+            await push(gossipRef, {
+                text: textInput.value,
+                image: base64Image,
+                time: new Date().toLocaleString('cs-CZ')
+            });
+            
+            // Resetování formuláře po úspěchu
+            textInput.value = "";
+            fileInput.value = "";
+            document.getElementById('preview').style.display = 'none';
+        } catch (e) {
+            alert("Chyba při odesílání. Zkontroluj Rules ve Firebase!");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "POST";
+        }
+    };
+
+    // NAČÍTÁNÍ DAT V REÁLNÉM ČASE
+    onValue(gossipRef, (snapshot) => {
+        const feed = document.getElementById('gossipFeed');
+        const data = snapshot.val();
+        feed.innerHTML = "";
+        
+        if (data) {
+            // Seřadíme drby od nejnovějšího
+            const items = Object.values(data).reverse();
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div style="font-size:16px; line-height:1.4;">${item.text || ""}</div>
+                    ${item.image ? `<img src="${item.image}" class="gossip-img">` : ""}
+                    <div style="color:var(--muted); font-size:10px; margin-top:10px; letter-spacing:1px;">${item.time}</div>
+                `;
+                feed.appendChild(card);
+            });
+        } else {
+            feed.innerHTML = "<div style='text-align:center; color:var(--muted); margin-top:50px;'>Zatím žádné drby. Buď první! 👀</div>";
+        }
     });
-    allGossip.sort((a, b) => b.time - a.time);
-  }
-  renderAll();
-});
-
-window.postGossip = function() {
-  const input = document.getElementById('gossipInput');
-  const text = input.value.trim();
-  if (!text) return;
-  push(gossipRef, { text: text, time: Date.now() });
-  input.value = '';
-};
-
-function renderAll() {
-  const feed = document.getElementById('gossipFeed');
-  feed.innerHTML = allGossip.map(g => `<div class="card"><div class="gossip-text">${g.text}</div></div>`).join('');
-
-  const featured = document.getElementById('featuredGossip');
-  if (allGossip[0]) {
-    featured.innerHTML = `<div class="featured"><div>${allGossip[0].text}</div></div>`;
-  }
-
-  const sorted = Object.entries(people).sort((a,b) => b[1]-a[1]);
-  const rankHTML = sorted.map(([name, score], i) => `
-    <div class="card rank-card">
-      <div class="rank-num ${i<1?'top':''}">#${i+1}</div>
-      <div class="rank-name">${name}</div>
-      <div class="rank-score">${score} pts</div>
-    </div>`).join('');
-  
-  document.getElementById('homeRanking').innerHTML = rankHTML;
-  document.getElementById('fullRanking').innerHTML = rankHTML;
-}
 </script>
 
-<script>
-function toggleMenu() {
-  document.getElementById('hamburger').classList.toggle('open');
-  document.getElementById('menuOverlay').classList.toggle('open');
-}
-function goTo(page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(page + 'Page').classList.add('active');
-  document.getElementById('inputArea').style.display = (page === 'gossip') ? 'block' : 'none';
-  toggleMenu();
-}
-</script>
 </body>
 </html>
