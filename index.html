@@ -1,164 +1,562 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <title>THE LIST</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>
+:root {
+  --bg: #080808;
+  --surface: #111111;
+  --surface2: #1a1a1a;
+  --accent: #ff2d55;
+  --accent2: #ff6b6b;
+  --text: #ffffff;
+  --muted: #555;
+  --border: #222;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
 body {
-    margin: 0;
-    font-family: Arial;
-    background: #0a0a0a;
-    color: white;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
-.container {
-    max-width: 400px;
-    margin: auto;
-    padding: 15px;
+/* HEADER */
+.header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(8,8,8,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-h1 { text-align: center; }
-
-.nav {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 15px;
+.logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 4px;
+  background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.nav button {
-    flex: 1;
-    margin: 2px;
-    padding: 10px;
-    background: #1a1a1a;
-    color: white;
-    border: none;
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 4px;
 }
 
+.hamburger span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: white;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* MENU OVERLAY */
+.menu-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 99;
+  background: rgba(0,0,0,0.97);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.77,0,0.175,1);
+}
+
+.menu-overlay.open { transform: translateX(0); }
+
+.menu-item {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 52px;
+  letter-spacing: 6px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 8px 40px;
+  position: relative;
+}
+
+.menu-item::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: 0;
+  width: 0; height: 2px;
+  background: var(--accent);
+  transition: width 0.3s;
+}
+
+.menu-item:hover, .menu-item.active {
+  color: white;
+}
+.menu-item:hover::after, .menu-item.active::after { width: 100%; }
+
+/* CONTENT */
+.content {
+  padding-top: 75px;
+  padding-bottom: 30px;
+  max-width: 480px;
+  margin: auto;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+/* PAGES */
+.page { display: none; animation: fadeUp 0.4s ease; }
+.page.active { display: block; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* SECTION TITLE */
+.section-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px;
+  letter-spacing: 3px;
+  margin: 24px 0 16px;
+  color: white;
+}
+
+.section-title span {
+  color: var(--accent);
+}
+
+/* CARDS */
 .card {
-    background: #1a1a1a;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  transition: border-color 0.2s, transform 0.2s;
+  animation: fadeUp 0.3s ease;
 }
 
-input, button.post {
-    width: 100%;
-    padding: 10px;
-    margin-top: 8px;
-    border-radius: 8px;
-    border: none;
+.card:hover { border-color: #333; transform: translateY(-1px); }
+
+/* GOSSIP CARD */
+.gossip-text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #ddd;
 }
 
-button.post {
-    background: white;
-    color: black;
-    cursor: pointer;
+.gossip-time {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 6px;
 }
 
-.hidden { display: none; }
+/* RANKING CARD */
+.rank-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.rank-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  color: var(--muted);
+  min-width: 36px;
+}
+
+.rank-num.top { color: var(--accent); }
+
+.rank-name {
+  font-size: 16px;
+  font-weight: 500;
+  flex: 1;
+}
+
+.rank-score {
+  font-size: 12px;
+  color: var(--muted);
+  background: var(--surface2);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+/* HOT BADGE */
+.hot-badge {
+  font-size: 10px;
+  background: var(--accent);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+/* INPUT AREA */
+.input-area {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(8,8,8,0.97);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  padding: 12px 20px 28px;
+  display: none;
+}
+
+.input-area.visible { display: block; }
+
+.input-row {
+  display: flex;
+  gap: 10px;
+  max-width: 480px;
+  margin: auto;
+}
+
+.input-row input {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-row input:focus { border-color: var(--accent); }
+.input-row input::placeholder { color: var(--muted); }
+
+.post-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.post-btn:active { transform: scale(0.96); opacity: 0.8; }
+
+/* LIVE DOT */
+.live-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #4caf50;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.live-dot::before {
+  content: '';
+  width: 7px; height: 7px;
+  background: #4caf50;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+/* FEATURED */
+.featured {
+  background: linear-gradient(135deg, #1a0a0d, #1a1a1a);
+  border: 1px solid rgba(255,45,85,0.3);
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.featured-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.featured-text {
+  font-size: 16px;
+  line-height: 1.5;
+  color: white;
+}
+
+/* EMPTY */
+.empty {
+  text-align: center;
+  color: var(--muted);
+  padding: 40px 20px;
+  font-size: 14px;
+}
+
+/* STATUS */
+.status-bar {
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+  padding: 8px;
+  letter-spacing: 1px;
+}
+
+/* GOSSIP PAGE padding for input */
+#gossipPage { padding-bottom: 100px; }
 </style>
-</head>
 
+</head>
 <body>
 
-<div class="container">
-    <h1>THE LIST</h1>
+<!-- HEADER -->
 
-    <div class="nav">
-        <button onclick="showTab('home')">Home</button>
-        <button onclick="showTab('ranking')">Ranking</button>
-        <button onclick="showTab('gossip')">Gossip</button>
-    </div>
-
-    <!-- HOME -->
-    <div id="home">
-        <h3>Latest Gossip</h3>
-        <div id="latest"></div>
-    </div>
-
-    <!-- RANKING -->
-    <div id="ranking" class="hidden">
-        <h3>Ranking</h3>
-        <div id="rankingList"></div>
-    </div>
-
-    <!-- GOSSIP -->
-    <div id="gossip" class="hidden">
-        <h3>All Gossip</h3>
-        <div id="feed"></div>
-
-        <input id="input" placeholder="Write gossip... (mention name)">
-        <button class="post" onclick="addGossip()">POST</button>
-    </div>
+<div class="header">
+  <div class="logo">THE LIST</div>
+  <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
 </div>
 
-<script>
-// default ranking
-let people = {
-    "Lily": 5,
-    "Mason": 4,
-    "Chloe": 3,
-    "Daniel": 2,
-    "Alison": 1
+<!-- MENU OVERLAY -->
+
+<div class="menu-overlay" id="menuOverlay">
+  <div class="menu-item active" id="menu-home" onclick="goTo('home')">HOME</div>
+  <div class="menu-item" id="menu-ranking" onclick="goTo('ranking')">RANKING</div>
+  <div class="menu-item" id="menu-gossip" onclick="goTo('gossip')">GOSSIP</div>
+</div>
+
+<!-- CONTENT -->
+
+<div class="content">
+
+  <!-- HOME PAGE -->
+
+  <div class="page active" id="homePage">
+    <div class="section-title">LATEST <span>DROP</span></div>
+    <div class="live-dot">LIVE</div>
+    <div id="featuredGossip">
+      <div class="empty">No gossip yet. Be the first. 👀</div>
+    </div>
+    <div class="section-title" style="margin-top:32px">TOP <span>3</span></div>
+    <div id="homeRanking"></div>
+  </div>
+
+  <!-- RANKING PAGE -->
+
+  <div class="page" id="rankingPage">
+    <div class="section-title">THE <span>RANKING</span></div>
+    <div id="fullRanking"></div>
+    <div class="status-bar" id="rankingStatus">Rankings update with every gossip post</div>
+  </div>
+
+  <!-- GOSSIP PAGE -->
+
+  <div class="page" id="gossipPage">
+    <div class="section-title">ALL <span>GOSSIP</span></div>
+    <div class="live-dot">LIVE FEED</div>
+    <div id="gossipFeed">
+      <div class="empty">Loading...</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- GOSSIP INPUT (only on gossip page) -->
+
+<div class="input-area" id="inputArea">
+  <div class="input-row">
+    <input id="gossipInput" placeholder="Post anonymous gossip... mention a name" maxlength="200">
+    <button class="post-btn" onclick="postGossip()">POST</button>
+  </div>
+</div>
+
+<!-- FIREBASE -->
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, push, onValue, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+// ⚠️ NASTAV SVÉ FIREBASE ÚDAJE:
+const firebaseConfig = {
+  apiKey: "TVUJ_API_KEY",
+  authDomain: "TVUJ_PROJECT.firebaseapp.com",
+  databaseURL: "https://TVUJ_PROJECT-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "TVUJ_PROJECT",
+  storageBucket: "TVUJ_PROJECT.appspot.com",
+  messagingSenderId: "TVUJ_ID",
+  appId: "TVUJ_APP_ID"
 };
 
-// load gossip
-let gossip = JSON.parse(localStorage.getItem("gossip")) || [];
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const gossipRef = ref(db, 'gossip');
 
-// SAVE
-function save() {
-    localStorage.setItem("gossip", JSON.stringify(gossip));
-}
+let allGossip = [];
 
-// ADD GOSSIP
-function addGossip() {
-    const input = document.getElementById("input").value;
-    if(input.trim() === "") return;
+let people = {
+  "Lily": 5, "Mason": 4, "Chloe": 3, "Daniel": 2, "Alison": 1
+};
 
-    gossip.unshift(input);
-
-    // simple ranking logic
-    for (let name in people) {
-        if (input.toLowerCase().includes(name.toLowerCase())) {
-            people[name] += 1;
+// LISTEN realtime
+onValue(gossipRef, (snapshot) => {
+  allGossip = [];
+  const data = snapshot.val();
+  if (data) {
+    Object.values(data).forEach(item => {
+      allGossip.push(item);
+      // update ranking
+      for (let name in people) {
+        if (item.text && item.text.toLowerCase().includes(name.toLowerCase())) {
+          people[name] += 0.5;
         }
-    }
+      }
+    });
+    allGossip.sort((a, b) => (b.time || 0) - (a.time || 0));
+  }
+  renderAll();
+});
 
-    save();
-    render();
-    document.getElementById("input").value = "";
+// POST
+window.postGossip = function() {
+  const input = document.getElementById('gossipInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  push(gossipRef, {
+    text: text,
+    time: Date.now()
+  });
+
+  input.value = '';
+};
+
+// Enter key
+document.getElementById('gossipInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') window.postGossip();
+});
+
+function timeAgo(ms) {
+  const diff = Date.now() - ms;
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h/24)}d ago`;
 }
 
-// RENDER
-function render() {
+function renderAll() {
+  // Featured (latest)
+  const featured = document.getElementById('featuredGossip');
+  if (allGossip.length > 0) {
+    const g = allGossip[0];
+    featured.innerHTML = `
+      <div class="featured">
+        <div class="featured-label">JUST IN 🔥</div>
+        <div class="featured-text">"${escHtml(g.text)}"</div>
+        <div class="gossip-time">${timeAgo(g.time)}</div>
+      </div>
+    `;
+  } else {
+    featured.innerHTML = '<div class="empty">No gossip yet. Be the first. 👀</div>';
+  }
 
-    // latest
-    document.getElementById("latest").innerHTML =
-        gossip.length ? `<div class="card">"${gossip[0]}"</div>` : "No gossip yet";
+  // Home ranking top 3
+  const sorted = Object.entries(people).sort((a,b) => b[1]-a[1]).slice(0,3);
+  document.getElementById('homeRanking').innerHTML = sorted.map(([name, score], i) => `
+    <div class="card rank-card">
+      <div class="rank-num ${i===0?'top'}">#${i+1}</div>
+      <div class="rank-name">${name}</div>
+      ${i===0 ? '<span class="hot-badge">👑 HOT</span>' : ''}
+      <div class="rank-score">${Math.floor(score)} pts</div>
+    </div>
+  `).join('');
 
-    // feed
-    document.getElementById("feed").innerHTML =
-        gossip.map(g => `<div class="card">"${g}"</div>`).join("");
+  // Full ranking
+  const allSorted = Object.entries(people).sort((a,b) => b[1]-a[1]);
+  document.getElementById('fullRanking').innerHTML = allSorted.map(([name, score], i) => `
+    <div class="card rank-card">
+      <div class="rank-num ${i===0?'top'}">#${i+1}</div>
+      <div class="rank-name">${name}</div>
+      ${i===0 ? '<span class="hot-badge">👑</span>' : ''}
+      <div class="rank-score">${Math.floor(score)} pts</div>
+    </div>
+  `).join('');
 
-    // ranking
-    let sorted = Object.entries(people).sort((a,b)=>b[1]-a[1]);
-
-    document.getElementById("rankingList").innerHTML =
-        sorted.map((p,i)=>`<div class="card">#${i+1} ${p[0]} (${p[1]})</div>`).join("");
+  // Gossip feed
+  const feed = document.getElementById('gossipFeed');
+  if (allGossip.length === 0) {
+    feed.innerHTML = '<div class="empty">No gossip yet. Be the first. 👀</div>';
+  } else {
+    feed.innerHTML = allGossip.map(g => `
+      <div class="card">
+        <div class="gossip-text">"${escHtml(g.text)}"</div>
+        <div class="gossip-time">${timeAgo(g.time)}</div>
+      </div>
+    `).join('');
+  }
 }
 
-// TABS
-function showTab(tab) {
-    document.getElementById("home").classList.add("hidden");
-    document.getElementById("ranking").classList.add("hidden");
-    document.getElementById("gossip").classList.add("hidden");
-
-    document.getElementById(tab).classList.remove("hidden");
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+</script>
 
-// INIT
-render();
+<script>
+// NAV
+let currentPage = 'home';
+
+window.toggleMenu = function() {
+  document.getElementById('hamburger').classList.toggle('open');
+  document.getElementById('menuOverlay').classList.toggle('open');
+};
+
+window.goTo = function(page) {
+  // hide all
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+
+  document.getElementById(page + 'Page').classList.add('active');
+  document.getElementById('menu-' + page).classList.add('active');
+
+  // show input only on gossip
+  const input = document.getElementById('inputArea');
+  if (page === 'gossip') input.classList.add('visible');
+  else input.classList.remove('visible');
+
+  currentPage = page;
+  toggleMenu();
+};
 </script>
 
 </body>
