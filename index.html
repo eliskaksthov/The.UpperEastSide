@@ -158,8 +158,11 @@ window.uploadBackground = function() {
     reader.readAsDataURL(file);
 };
 
-if(localStorage.getItem('customBg')) {
-    document.body.style.backgroundImage = `url(${localStorage.getItem('customBg')})`;
+// Priorita: 1. Nahrané pozadí v prohlížeči, 2. Tvoje hlavní fotka pro všechny
+const savedBg = localStorage.getItem('customBg');
+const defaultBg = "SEM_VLOŽ_ODKAZ_NA_FOTKU"; 
+document.body.style.backgroundImage = `url(${savedBg || defaultBg})`;
+
 }
 
 // --- NAVIGACE ---
