@@ -1,175 +1,260 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <title>THE LIST</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-    <style>
-        :root { --bg: #080808; --surface: #111111; --accent: #ff2d55; --text: #ffffff; --muted: #555; --border: #222; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 120px; }
-        
-        .header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(8,8,8,0.9); backdrop-filter: blur(15px); border-bottom: 1px solid var(--border); padding: 15px 20px; text-align: left; }
-        .logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 4px; color: var(--accent); }
-        
-        .content { padding: 90px 20px 20px; max-width: 500px; margin: auto; }
-        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 15px; padding: 15px; margin-bottom: 15px; animation: fadeIn 0.5s ease; }
-        .gossip-img { width: 100%; border-radius: 10px; margin-top: 10px; display: block; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE LIST</title>
 
-        .person { color: var(--accent); font-size: 12px; margin-bottom: 5px; }
-        .meta { color: var(--muted); font-size: 10px; margin-top: 10px; }
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans&display=swap" rel="stylesheet">
 
-        .actions { margin-top: 10px; display: flex; gap: 10px; align-items: center; }
-        .like-btn, .admin-btn {
-            background: none;
-            border: 1px solid var(--border);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
+<style>
+:root {
+    --bg: #080808;
+    --surface: #111;
+    --accent: #ff2d55;
+    --text: #fff;
+    --border: #222;
+}
 
-        .input-area { position: fixed; bottom: 0; left: 0; right: 0; background: #000; border-top: 1px solid var(--border); padding: 15px; z-index: 101; }
-        .input-container { max-width: 500px; margin: auto; display: flex; flex-direction: column; gap: 10px; }
-        input[type="text"] { background: var(--surface); border: 1px solid var(--border); color: white; padding: 12px; border-radius: 10px; outline: none; width: 100%; }
-        
-        .row { display: flex; gap: 10px; align-items: center; }
-        .post-btn { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 10px; font-family: 'Bebas Neue', sans-serif; cursor: pointer; }
-        
-        #preview { display: none; width: 40px; height: 40px; border-radius: 5px; object-fit: cover; border: 1px solid var(--accent); }
+body {
+    margin: 0;
+    font-family: 'DM Sans';
+    color: white;
+    background: var(--bg);
+    background-size: cover;
+    background-position: center;
+}
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
+/* HEADER */
+.header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    z-index: 100;
+}
+
+.logo {
+    font-family: 'Bebas Neue';
+    color: var(--accent);
+    font-size: 26px;
+}
+
+.menu-btn {
+    font-size: 22px;
+    cursor: pointer;
+}
+
+/* SIDEBAR */
+.sidebar {
+    position: fixed;
+    left: -250px;
+    top: 0;
+    width: 250px;
+    height: 100%;
+    background: black;
+    padding: 20px;
+    transition: 0.3s;
+    z-index: 200;
+}
+
+.sidebar.active {
+    left: 0;
+}
+
+.sidebar div {
+    margin: 15px 0;
+    cursor: pointer;
+}
+
+/* CONTENT */
+.content {
+    padding: 80px 15px;
+}
+
+.card {
+    background: rgba(0,0,0,0.7);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+}
+
+/* INPUT */
+.input-area {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: black;
+    padding: 10px;
+}
+
+input {
+    width: 100%;
+    margin-bottom: 5px;
+    padding: 10px;
+    background: #111;
+    border: none;
+    color: white;
+}
+
+button {
+    background: var(--accent);
+    border: none;
+    padding: 10px;
+    color: white;
+    width: 100%;
+}
+
+.gossip-img {
+    width: 100%;
+    margin-top: 10px;
+    border-radius: 10px;
+}
+</style>
 </head>
+
 <body>
 
-<div class="header"><div class="logo">THE LIST</div></div>
-<div class="content" id="gossipFeed">Načítám...</div>
+<div class="header">
+    <div class="menu-btn" onclick="toggleMenu()">☰</div>
+    <div class="logo">THE LIST</div>
+</div>
+
+<div class="sidebar" id="menu">
+    <div onclick="showFeed()">🏠 Feed</div>
+    <div onclick="showTop()">🔥 Ranking</div>
+    <div onclick="changeBg()">🖼️ Změnit pozadí</div>
+</div>
+
+<div class="content" id="feed"></div>
 
 <div class="input-area">
-    <div class="input-container">
-        <input type="text" id="personInput" placeholder="O kom to je?">
-        <input type="text" id="gossipInput" placeholder="Napiš anonymní drb...">
-        
-        <div class="row">
-            <label style="cursor:pointer;">
-                📷 <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="showPreview()">
-            </label>
-            <img id="preview">
-            <button class="post-btn" id="postBtn">POST</button>
-        </div>
-    </div>
+    <input id="person" placeholder="O kom">
+    <input id="text" placeholder="Drb">
+    <input type="file" id="file">
+    <button onclick="addPost()">POST</button>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-const firebaseConfig = {
+const app = initializeApp({
     apiKey: "AIzaSy...",
-    authDomain: "the-list-1efde.firebaseapp.com",
     databaseURL: "https://the-list-1efde-default-rtdb.europe-west1.firebasedatabase.app"
-};
+});
 
-const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const gossipRef = ref(db, 'gossip');
 
-const isAdmin = prompt("Admin heslo?") === "1234";
+/* ADMIN PŘÍSTUP (jen 2 lidi) */
+const ADMINS = ["device1", "device2"]; 
+const myId = localStorage.getItem("id") || Math.random().toString(36);
+localStorage.setItem("id", myId);
 
-// preview
-window.showPreview = function() {
-    const file = document.getElementById('fileInput').files[0];
-    const preview = document.getElementById('preview');
+const isAdmin = ADMINS.includes(myId);
+
+/* MENU */
+window.toggleMenu = () => {
+    document.getElementById("menu").classList.toggle("active");
+};
+
+/* BACKGROUND */
+window.changeBg = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+
+    input.onchange = () => {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = () => {
+            document.body.style.backgroundImage = `url(${reader.result})`;
+            localStorage.setItem("bg", reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    input.click();
+};
+
+const savedBg = localStorage.getItem("bg");
+if (savedBg) document.body.style.backgroundImage = `url(${savedBg})`;
+
+/* POST */
+window.addPost = async () => {
+    const text = document.getElementById("text").value;
+    const person = document.getElementById("person").value;
+    const file = document.getElementById("file").files[0];
+
+    let img = "";
     if (file) {
-        preview.src = URL.createObjectURL(file);
-        preview.style.display = 'block';
-    }
-}
-
-// post
-document.getElementById('postBtn').onclick = async () => {
-    const text = document.getElementById('gossipInput').value;
-    const person = document.getElementById('personInput').value;
-    const file = document.getElementById('fileInput').files[0];
-
-    let base64 = "";
-    if (file) {
-        base64 = await new Promise(res => {
-            const reader = new FileReader();
-            reader.onload = () => res(reader.result);
-            reader.readAsDataURL(file);
+        img = await new Promise(res => {
+            const r = new FileReader();
+            r.onload = () => res(r.result);
+            r.readAsDataURL(file);
         });
     }
 
     await push(gossipRef, {
         text,
         person,
-        image: base64,
-        time: new Date().toLocaleString('cs-CZ'),
-        approved: false,
-        likes: 0
-    });
-
-    location.reload();
-};
-
-// like
-window.likePost = (id, currentLikes) => {
-    update(ref(db, 'gossip/' + id), {
-        likes: (currentLikes || 0) + 1
+        img,
+        likes: 0,
+        approved: false
     });
 };
 
-// approve
-window.approvePost = (id) => {
-    update(ref(db, 'gossip/' + id), { approved: true });
+/* LIKE */
+window.like = (id, l) => {
+    update(ref(db, "gossip/" + id), { likes: (l || 0) + 1 });
 };
 
-// delete
-window.deletePost = (id) => {
-    remove(ref(db, 'gossip/' + id));
+/* APPROVE */
+window.approve = (id) => {
+    update(ref(db, "gossip/" + id), { approved: true });
 };
 
-// load
-onValue(gossipRef, (snapshot) => {
-    const feed = document.getElementById('gossipFeed');
-    const data = snapshot.val();
+/* LOAD */
+onValue(gossipRef, snap => {
+    const data = snap.val();
+    const feed = document.getElementById("feed");
     feed.innerHTML = "";
 
     if (!data) return;
 
-    const items = Object.entries(data)
-        .sort((a,b) => (b[1].likes || 0) - (a[1].likes || 0));
+    const arr = Object.entries(data)
+        .sort((a,b)=> (b[1].likes||0)-(a[1].likes||0));
 
-    items.forEach(([id, item]) => {
+    arr.forEach(([id, p]) => {
 
-        if (!item.approved && !isAdmin) return;
+        if (!p.approved && !isAdmin) return;
 
-        const card = document.createElement('div');
-        card.className = 'card';
+        const div = document.createElement("div");
+        div.className = "card";
 
-        card.innerHTML = `
-            <div class="person">@${item.person || "unknown"}</div>
-            <div>${item.text || ""}</div>
-            ${item.image ? `<img src="${item.image}" class="gossip-img">` : ""}
-            <div class="meta">${item.time}</div>
-
-            <div class="actions">
-                ❤️ ${item.likes || 0}
-                <button class="like-btn" onclick="likePost('${id}', ${item.likes || 0})">Like</button>
-
-                ${isAdmin && !item.approved ? `
-                    <button class="admin-btn" onclick="approvePost('${id}')">✔️</button>
-                    <button class="admin-btn" onclick="deletePost('${id}')">🗑️</button>
-                ` : ""}
-            </div>
+        div.innerHTML = `
+            <b>@${p.person}</b><br>
+            ${p.text}
+            ${p.img ? `<img src="${p.img}" class="gossip-img">` : ""}
+            <br>❤️ ${p.likes || 0}
+            <button onclick="like('${id}', ${p.likes})">Like</button>
+            ${isAdmin && !p.approved ? `<button onclick="approve('${id}')">✔️</button>` : ""}
         `;
 
-        feed.appendChild(card);
+        feed.appendChild(div);
     });
 });
+
+/* RANKING VIEW */
+window.showTop = () => {
+    alert("Ranking = seřazeno podle liků 🔥");
+};
+
+window.showFeed = () => location.reload();
+
 </script>
 
 </body>
