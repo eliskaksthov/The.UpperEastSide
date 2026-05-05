@@ -111,7 +111,22 @@
 
         .person { color: var(--accent); font-size: 14px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
         
-        
+        /* =============================================
+           TYP DRBU — POMLUVA vs. POCHVALA
+           ============================================= */
+        .type-badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .type-badge.gossip { background: rgba(255,45,85,0.15); color: var(--accent); border: 1px solid rgba(255,45,85,0.3); }
+        .type-badge.praise { background: rgba(48,209,88,0.15); color: var(--accent-good); border: 1px solid rgba(48,209,88,0.3); }
+
         /* =============================================
            RANKING
            Řadí se podle počtu zmínek — čím víc zmínek,
@@ -256,7 +271,21 @@
         }
         input[type="text"]::placeholder { color: var(--muted); }
 
-        
+        /* =============================================
+           VÝBĚR TYPU (POMLUVA / POCHVALA)
+           ============================================= */
+        .type-selector { display: flex; gap: 8px; }
+        .type-btn {
+            flex: 1; padding: 10px; border-radius: 10px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.05);
+            color: var(--muted);
+            cursor: pointer; font-family: 'Bebas Neue', sans-serif;
+            font-size: 15px; text-align: center; transition: 0.2s;
+        }
+        .type-btn.selected-gossip { background: rgba(255,45,85,0.15); color: var(--accent); border-color: var(--accent); }
+        .type-btn.selected-praise { background: rgba(48,209,88,0.15); color: var(--accent-good); border-color: var(--accent-good); }
+
         /* =============================================
            TLACITKO POSLAT
            ============================================= */
@@ -338,6 +367,10 @@
     <div class="input-container">
         <input type="text" id="personInput" placeholder="O kom to je?">
         <input type="text" id="gossipInput" placeholder="Co se stalo?">
+        <div class="type-selector">
+            <button class="type-btn selected-gossip" id="btnGossip" onclick="selectType('gossip')">POMLUVA</button>
+            <button class="type-btn" id="btnPraise" onclick="selectType('praise')">POCHVALA</button>
+        </div>
         <div style="display: flex; gap: 10px;">
             <label style="background:rgba(255,255,255,0.07); padding:12px; border-radius:10px; cursor:pointer; flex:1; text-align:center; border:1px solid var(--border); font-size:14px;" id="photoLabel">
                 FOTO
@@ -466,6 +499,15 @@ function closeInputArea() {
     document.getElementById('mainContent').classList.remove('input-visible');
 }
 
+// =============================================
+// VÝBĚR TYPU (POMLUVA / POCHVALA)
+// =============================================
+let selectedType = 'gossip';
+window.selectType = (type) => {
+    selectedType = type;
+    document.getElementById('btnGossip').className = 'type-btn' + (type === 'gossip' ? ' selected-gossip' : '');
+    document.getElementById('btnPraise').className = 'type-btn' + (type === 'praise' ? ' selected-praise' : '');
+};
 
 // =============================================
 // ODESLÁNÍ NOVÉHO DRBU
@@ -540,7 +582,12 @@ onValue(gossipRef, (snapshot) => {
                 }
             });
 
-        
+            // --- FEED ---
+            const isPraise  = item.type === 'praise';
+            const badgeHtml = isPraise
+                ? `<span class="type-badge praise">POCHVALA</span>`
+                : `<span class="type-badge gossip">POMLUVA</span>`;
+
             feed.innerHTML += `
                 <div class="card">
                     ${badgeHtml}
@@ -557,6 +604,7 @@ onValue(gossipRef, (snapshot) => {
 
         } else if (isAdmin) {
             // --- ADMIN: KE SCHVÁLENÍ ---
+            const typLabel = item.type === 'praise' ? 'POCHVALA' : 'POMLUVA';
             adminDiv.innerHTML += `
                 <div class="card" style="border-color: var(--accent)">
                     <div style="font-size:12px; color:var(--muted); margin-bottom:5px;">${typLabel}</div>
