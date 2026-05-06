@@ -120,10 +120,12 @@
 </div>
 
 <div class="menu" id="navMenu">
-    <button onclick="showSection('feed')">GOSSIPS</button>
     <button onclick="showSection('recent')">FEED 24H</button>
+    <button onclick="showSection('feed')">GOSSIPS</button>
     <button onclick="showSection('ranking')">RANKING</button>
+    
     <button id="loginBtn" onclick="showSection('login')">LOGIN</button>
+    
     <button class="admin-only" onclick="showSection('admin')">ADMIN</button>
     <button class="admin-only" onclick="logout()" style="color: var(--accent);">LOG OUT</button>
 </div>
@@ -167,7 +169,6 @@
 </div>
 
 <script>
-// --- KONFIGURACE ---
 const SUPABASE_URL = 'https://rfpsagdsxqstbvtdcsmy.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_QAlABDjRq-eDetfcgWC6xA_vQz21wrG';
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -175,7 +176,6 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const ADMIN_PASS = "1234";
 const RANKED_PEOPLE = ["Lily", "Mason", "Alison", "Katie", "James"];
 
-// --- NAVIGACE ---
 function showSection(id) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
@@ -201,7 +201,6 @@ function toggleInputArea() {
     document.getElementById('inputToggle').innerText = area.classList.contains('open') ? '×' : '+';
 }
 
-// --- ADMIN LOGIKA ---
 const isAdmin = localStorage.getItem('isInsiderAdmin') === 'true';
 if (isAdmin) document.body.classList.add('is-admin');
 
@@ -212,8 +211,6 @@ function handleLogin() {
     } else { alert("Chybné heslo"); }
 }
 function logout() { localStorage.removeItem('isInsiderAdmin'); location.reload(); }
-
-// --- CORE FUNKCE ---
 
 async function submitGossip() {
     const person = document.getElementById('personInput').value.trim();
@@ -259,7 +256,6 @@ async function loadData() {
     const now = new Date();
 
     gossips.forEach(item => {
-        // Tlačítko SMAZAT se ukáže jen adminovi
         const deleteBtn = isAdmin 
             ? `<button onclick="deletePost('${item.id}')" style="color:var(--accent); background:none; border:none; font-family:'Bebas Neue'; cursor:pointer;">SMAZAT</button>` 
             : '';
@@ -329,15 +325,8 @@ async function approvePost(id) {
 async function deletePost(id) {
     if (!isAdmin) return;
     if (!confirm("Smazat?")) return;
-
     const { error } = await _supabase.from('gossips').delete().eq('id', id);
-    
-    if (error) {
-        console.error("Chyba mazání:", error);
-        alert("Chyba: " + error.message + "\nZkontroluj RLS v Supabase!");
-    } else {
-        loadData();
-    }
+    if (!error) loadData();
 }
 
 loadData();
