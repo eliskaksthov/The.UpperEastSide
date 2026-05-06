@@ -189,7 +189,7 @@
 <div class="search-bar" id="searchBar">
     <div class="search-container">
         <div class="input-wrapper">
-            <input type="text" class="search-input" id="searchInput" placeholder="Hledat osobu nebo text..." onkeypress="if(event.key === 'Enter') confirmSearch()">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search for a person or text..." onkeypress="if(event.key === 'Enter') confirmSearch()">
             <button class="clear-search" onclick="clearSearch()">✕</button>
         </div>
         <button class="search-confirm-btn" onclick="confirmSearch()">SEARCH</button>
@@ -197,10 +197,10 @@
 </div>
 
 <div class="menu" id="navMenu">
-    <button onclick="showSection('recent')">FEED 24H</button>
+    <button onclick="showSection('recent')">FEED</button>
     <button onclick="showSection('feed')">GOSSIPS</button>
     <button onclick="showSection('ranking')">RANKING</button>
-    <button id="loginBtn" class="guest-only" onclick="showSection('login')">LOGIN</button>
+    <button id="loginBtn" class="guest-only" onclick="showSection('login')">LOG IN</button>
     <button class="admin-only" onclick="showSection('admin')">ADMIN</button>
     <button class="admin-only" onclick="logout()" style="color: var(--accent);">LOG OUT</button>
 </div>
@@ -222,13 +222,13 @@
     </div>
     <div id="login" class="section">
         <div class="card">
-            <h2 style="font-family:'Bebas Neue'">Admin Access</h2>
+            <h2 style="font-family:'Bebas Neue'">Admin</h2>
             <input type="password" id="adminPass" placeholder="Heslo" style="width:100%; margin: 10px 0; padding:10px; background:#222; color:white; border:none; border-radius:8px;">
-            <button class="post-btn" onclick="handleLogin()">Vstoupit</button>
+            <button class="post-btn" onclick="handleLogin()">Enter</button>
         </div>
     </div>
     <div id="admin" class="section">
-        <h2 style="font-family:'Bebas Neue'; margin-bottom: 15px;">Ke schválení</h2>
+        <h2 style="font-family:'Bebas Neue'; margin-bottom: 15px;">For approval</h2>
         <div id="adminContent"></div>
     </div>
 </div>
@@ -236,10 +236,10 @@
 <button class="input-toggle-btn" id="inputToggle" onclick="toggleInputArea()" style="display:none;">+</button>
 
 <div class="input-area" id="inputArea">
-    <input type="text" id="personInput" placeholder="O kom?" style="width:100%; margin-bottom:5px; padding:10px; background:#222; color:white; border:none; border-radius:8px;">
-    <input type="text" id="gossipInput" placeholder="Co se stalo?" style="width:100%; margin-bottom:5px; padding:10px; background:#222; color:white; border:none; border-radius:8px;">
+    <input type="text" id="personInput" placeholder="Who was that about?" style="width:100%; margin-bottom:5px; padding:10px; background:#222; color:white; border:none; border-radius:8px;">
+    <input type="text" id="gossipInput" placeholder="What happened?" style="width:100%; margin-bottom:5px; padding:10px; background:#222; color:white; border:none; border-radius:8px;">
     <input type="file" id="fileInput" accept="image/*" style="margin-bottom:10px;">
-    <button class="post-btn" onclick="submitGossip()">ODESLAT</button>
+    <button class="post-btn" onclick="submitGossip()">SEND</button>
 </div>
 
 <script>
@@ -334,16 +334,16 @@ function renderGossips(gossips, filter = '') {
                 <div class="btn-row">
                     <button class="like-btn ${localStorage.getItem('liked_'+item.id) ? 'liked' : ''}" onclick="likePost('${item.id}', ${item.likes})">${item.likes} LIKES</button>
                     <button class="comm-btn" onclick="toggleComments('${prefix}', '${item.id}', ${allowWriting})">${commentCount} COMMENTS</button>
-                    ${isAdmin ? `<button onclick="deletePost('${item.id}', true)" style="color:var(--accent); background:none; border:none; font-family:'Bebas Neue'; cursor:pointer;">SMAZAT</button>` : ''}
+                    ${isAdmin ? `<button onclick="deletePost('${item.id}', true)" style="color:var(--accent); background:none; border:none; font-family:'Bebas Neue'; cursor:pointer;">DELETE</button>` : ''}
                 </div>
                 <div class="comments-box" id="${prefix}-box-${item.id}">
                     <div id="${prefix}-list-${item.id}"></div>
                     ${allowWriting ? `
                         <div class="comm-input-wrap">
-                            <input type="text" class="comm-input" id="${prefix}-input-${item.id}" placeholder="Napiš komentář...">
+                            <input type="text" class="comm-input" id="${prefix}-input-${item.id}" placeholder="Write a comment.">
                             <button class="comm-btn" style="background:var(--accent)" onclick="sendComment('${prefix}', '${item.id}')">-></button>
                         </div>
-                    ` : '<div style="font-size:11px; color:var(--muted); margin-top:10px; text-align:center;">Komentovat lze pouze v sekci GOSSIPS</div>'}
+                    ` : '<div style="font-size:11px; color:var(--muted); margin-top:10px; text-align:center;">Comments can only be made in the GOSSIPS</div>'}
                 </div>
             </div>
         `;
@@ -363,8 +363,8 @@ function renderGossips(gossips, filter = '') {
                     <div style="margin-bottom:10px;">${item.content}</div>
                     ${item.image_url ? `<img src="${item.image_url}" class="gossip-img" onclick="openLightbox('${item.image_url}')">` : ''}
                     <div class="btn-row">
-                        <button class="post-btn" style="background:var(--accent-good); width:auto;" onclick="approvePost('${item.id}')">SCHVÁLIT</button>
-                        <button class="post-btn" style="width:auto;" onclick="deletePost('${item.id}', false)">SMAZAT</button>
+                        <button class="post-btn" style="background:var(--accent-good); width:auto;" onclick="approvePost('${item.id}')">APPROVE</button>
+                        <button class="post-btn" style="width:auto;" onclick="deletePost('${item.id}', false)">DELETE</button>
                     </div>
                 </div>
             `;
@@ -387,12 +387,12 @@ function renderGossips(gossips, filter = '') {
                 </div>
                 <div class="comments-box" id="recent-box-${item.id}">
                     <div id="recent-list-${item.id}"></div>
-                    <div style="font-size:11px; color:var(--muted); margin-top:10px; text-align:center;">Komentovat lze pouze v sekci GOSSIPS</div>
+                    <div style="font-size:11px; color:var(--muted); margin-top:10px; text-align:center;">Comments can only be made in the GOSSIPS</div>
                 </div>
             </div>
         `;
     } else if (filter) {
-        recent.innerHTML = '<p style="text-align:center; color:var(--muted); margin-top:20px;">Nenalezen žádný výsledek pro: "' + filter + '"</p>';
+        recent.innerHTML = '<p style="text-align:center; color:var(--muted); margin-top:20px;">No results found for: "' + filter + '"</p>';
     }
 
     const sorted = [...RANKED_PEOPLE].sort((a,b) => stats[b.toLowerCase()] - stats[a.toLowerCase()]);
@@ -418,7 +418,7 @@ async function toggleComments(prefix, id, allowWriting) {
                 ${c.content}
                 ${isAdmin ? `<span style="color:red; cursor:pointer; position:absolute; right:10px; top:10px;" onclick="deleteComment('${c.id}')">×</span>` : ''}
             </div>
-        `).join('') : '<div style="font-size:12px; color:var(--muted); text-align:center; padding:10px;">Zatím žádné komentáře.</div>';
+        `).join('') : '<div style="font-size:12px; color:var(--muted); text-align:center; padding:10px;">No comments yet.</div>';
     }
 }
 
@@ -452,7 +452,7 @@ async function approvePost(id) {
 async function deletePost(id, isFeed) {
     // Pokud mažu z feedu (isFeed == true), zeptám se. Pokud z admina (ke schválení), smažu rovnou.
     if (isFeed) {
-        if (!confirm("Smazat příspěvek?")) return;
+        if (!confirm("Delete post?")) return;
     }
     
     await _supabase.from('gossips').delete().eq('id', id);
@@ -482,7 +482,7 @@ function handleLogin() {
     if (document.getElementById('adminPass').value === ADMIN_PASS) {
         localStorage.setItem('isInsiderAdmin', 'true');
         location.reload();
-    } else alert("Chyba");
+    } else alert("Error");
 }
 function logout() { localStorage.removeItem('isInsiderAdmin'); location.reload(); }
 
