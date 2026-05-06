@@ -58,8 +58,6 @@
         body.is-admin .admin-only { display: block !important; }
 
         .content { padding: 80px 20px 60px; max-width: 500px; margin: auto; }
-        
-        /* Styl pro velký příspěvek ve feedu */
         #recent.active { max-width: 900px; } 
 
         .section { display: none; }
@@ -72,7 +70,6 @@
             padding: 15px; margin-bottom: 15px;
         }
 
-        /* Hero efekt pro Feed 24h */
         .hero-card {
             width: 100%;
             min-height: 60vh;
@@ -80,13 +77,13 @@
             flex-direction: column;
             justify-content: center;
         }
-        .hero-card .gossip-img {
-            max-height: 50vh;
-            object-fit: contain;
-            background: #000;
-        }
 
-        .gossip-img { width: 100%; border-radius: 10px; margin: 10px 0; display: block;}
+        .gossip-img { 
+            width: 100%; border-radius: 10px; margin: 10px 0; display: block; 
+            cursor: pointer; transition: opacity 0.2s;
+        }
+        .gossip-img:hover { opacity: 0.9; }
+
         .person { color: var(--accent); font-size: 14px; font-weight: bold; text-transform: uppercase; }
         .post-time { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
 
@@ -111,6 +108,18 @@
         .comm-input { 
             flex: 1; background: #222; border: 1px solid #333; color: white;
             padding: 8px; border-radius: 5px; font-size: 13px; outline: none;
+        }
+
+        /* LIGHTBOX - FULLSCREEN IMAGE */
+        .lightbox {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 2000; justify-content: center; align-items: center;
+        }
+        .lightbox.active { display: flex; }
+        .lightbox img { max-width: 95%; max-height: 95%; object-fit: contain; border-radius: 5px; }
+        .lightbox-close {
+            position: absolute; top: 20px; right: 20px; color: white; font-size: 40px;
+            cursor: pointer; font-family: 'Bebas Neue'; line-height: 1;
         }
 
         .input-area { 
@@ -144,6 +153,11 @@
     <button id="loginBtn" onclick="showSection('login')">LOGIN</button>
     <button class="admin-only" onclick="showSection('admin')">ADMIN</button>
     <button class="admin-only" onclick="logout()" style="color: var(--accent);">LOG OUT</button>
+</div>
+
+<div class="lightbox" id="imageLightbox" onclick="closeLightbox()">
+    <span class="lightbox-close">&times;</span>
+    <img id="lightboxImg" src="">
 </div>
 
 <div class="content">
@@ -203,6 +217,17 @@ function toggleInputArea() {
     document.getElementById('inputToggle').innerText = area.classList.contains('open') ? '×' : '+';
 }
 
+// Lightbox Funkce
+function openLightbox(src) {
+    const lb = document.getElementById('imageLightbox');
+    const img = document.getElementById('lightboxImg');
+    img.src = src;
+    lb.classList.add('active');
+}
+function closeLightbox() {
+    document.getElementById('imageLightbox').classList.remove('active');
+}
+
 async function loadData() {
     const { data: gossips } = await _supabase.from('gossips').select('*, gossip_comments(count)').order('created_at', { ascending: false });
     
@@ -215,7 +240,6 @@ async function loadData() {
     const stats = {};
     RANKED_PEOPLE.forEach(p => stats[p.toLowerCase()] = 0);
 
-    // Příprava dat pro sekci "GOSSIPS" a "ADMIN"
     gossips.forEach(item => {
         const commentCount = item.gossip_comments?.[0]?.count || 0;
         
@@ -224,7 +248,7 @@ async function loadData() {
                 <div class="person">${item.person}</div>
                 <div class="post-time">${new Date(item.created_at).toLocaleString('cs-CZ')}</div>
                 <div style="font-size: ${isHero ? '20px' : '16px'}; margin-bottom:10px;">${item.content}</div>
-                ${item.image_url ? `<img src="${item.image_url}" class="gossip-img">` : ''}
+                ${item.image_url ? `<img src="${item.image_url}" class="gossip-img" onclick="openLightbox('${item.image_url}')">` : ''}
                 <div class="btn-row">
                     <button class="like-btn ${localStorage.getItem('liked_'+item.id) ? 'liked' : ''}" onclick="likePost('${item.id}', ${item.likes})">${item.likes} LIKES</button>
                     <button class="comm-btn" onclick="toggleComments('${prefix}', '${item.id}', ${allowWriting})">${commentCount} COMMENTS</button>
@@ -249,10 +273,12 @@ async function loadData() {
                 if (pLower.includes(name.toLowerCase())) stats[name.toLowerCase()]++;
             });
         } else if (isAdmin) {
+            // ADMIN CARD - Nyní včetně obrázku ke schválení
             adminList.innerHTML += `
                 <div class="card" style="border: 1px solid orange">
                     <div class="person">${item.person}</div>
-                    <div>${item.content}</div>
+                    <div style="margin-bottom:10px;">${item.content}</div>
+                    ${item.image_url ? `<img src="${item.image_url}" class="gossip-img" onclick="openLightbox('${item.image_url}')">` : ''}
                     <div class="btn-row">
                         <button class="post-btn" style="background:var(--accent-good); width:auto;" onclick="approvePost('${item.id}')">SCHVÁLIT</button>
                         <button class="post-btn" style="width:auto;" onclick="deletePost('${item.id}')">SMAZAT</button>
@@ -262,17 +288,16 @@ async function loadData() {
         }
     });
 
-    // Speciální zobrazení pro FEED 24H - Pouze jeden nejnovější schválený
     const latestGossip = gossips.find(g => g.approved === true);
     if (latestGossip) {
-        const item = latestGossip; // pro kompatibilitu s createCard vnitřkem by to chtělo refaktor, ale pro přehlednost to vložím ručně:
+        const item = latestGossip;
         const commentCount = item.gossip_comments?.[0]?.count || 0;
         recent.innerHTML = `
             <div class="card hero-card">
                 <div class="person" style="font-size: 18px;">${item.person}</div>
                 <div class="post-time">${new Date(item.created_at).toLocaleString('cs-CZ')}</div>
                 <div style="font-size: 22px; margin: 15px 0; line-height: 1.4;">${item.content}</div>
-                ${item.image_url ? `<img src="${item.image_url}" class="gossip-img">` : ''}
+                ${item.image_url ? `<img src="${item.image_url}" class="gossip-img" onclick="openLightbox('${item.image_url}')">` : ''}
                 <div class="btn-row">
                     <button class="like-btn ${localStorage.getItem('liked_'+item.id) ? 'liked' : ''}" onclick="likePost('${item.id}', ${item.likes})">${item.likes} LIKES</button>
                     <button class="comm-btn" onclick="toggleComments('recent', '${item.id}', false)">${commentCount} COMMENTS</button>
@@ -283,8 +308,6 @@ async function loadData() {
                 </div>
             </div>
         `;
-    } else {
-        recent.innerHTML = '<p style="text-align:center; color:var(--muted);">Zatím žádné novinky.</p>';
     }
 
     const sorted = [...RANKED_PEOPLE].sort((a,b) => stats[b.toLowerCase()] - stats[a.toLowerCase()]);
@@ -314,7 +337,6 @@ async function toggleComments(prefix, id, allowWriting) {
     }
 }
 
-// Ostatní pomocné funkce (likePost, sendComment, deleteComment, atd.) zůstávají stejné jako minule
 async function sendComment(prefix, gossipId) {
     const input = document.getElementById(`${prefix}-input-${gossipId}`);
     const content = input.value.trim();
@@ -362,6 +384,7 @@ async function submitGossip() {
         if (data) imageUrl = `${SUPABASE_URL}/storage/v1/object/public/gossip-images/${fileName}`;
     }
     await _supabase.from('gossips').insert([{ person, content, image_url: imageUrl }]);
+    alert("Odesláno ke schválení!");
     location.reload();
 }
 
