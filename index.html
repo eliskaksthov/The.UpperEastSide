@@ -60,15 +60,6 @@
         body.is-admin .admin-only { display: block !important; }
         body.is-admin #loginBtn { display: none !important; }
 
-        /* Hide input toggle button by default */
-        .input-toggle-btn {
-            display: none;
-        }
-        /* Show input toggle button only in GOSSIPS section */
-        #feed.active ~ .input-toggle-btn {
-            display: block;
-        }
-
         .content { padding: 80px 20px 60px; max-width: 500px; margin: auto; }
 
         .section { display: none; animation: fadeIn 0.4s ease; }
@@ -100,10 +91,12 @@
         }
         .input-area.open { transform: translateY(0); }
 
+        /* Tlačítko + defaultně skryté, ukážeme ho jen v sekci feed přes JS */
         .input-toggle-btn {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             width: 50px; height: 50px; border-radius: 50%; background: var(--accent);
             border: none; color: white; font-size: 24px; cursor: pointer; z-index: 200;
+            display: none;
         }
 
         input[type="text"] { 
@@ -141,7 +134,7 @@
         <div id="gossipFeed">Načítám drby...</div>
     </div>
 
-    <div id="recent" class="section">
+    <div id="recent" class="section active">
         <h2 class="section-title" style="font-family:'Bebas Neue'">Last 24 Hours</h2>
         <div id="recentFeed"></div>
     </div>
@@ -171,7 +164,7 @@
     <input type="text" id="personInput" placeholder="O kom?">
     <input type="text" id="gossipInput" placeholder="Co se stalo?">
     <input type="file" id="fileInput" accept="image/*" style="margin-bottom:10px;">
-    <button class="post-btn" onclick="submitGossip()">ODESLAT KE SCHVÁLENÍ</button>
+    <button class="post-btn" onclick="submitGossip()">ODESLAT</button>
 </div>
 
 <script>
@@ -180,7 +173,7 @@ const SUPABASE_URL = 'https://rfpsagdsxqstbvtdcsmy.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_QAlABDjRq-eDetfcgWC6xA_vQz21wrG';
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const ADMIN_PASS = "1234"; // Změň si
+const ADMIN_PASS = "1234";
 const RANKED_PEOPLE = ["Lily", "Mason", "Alison", "Katie", "James"];
 
 // --- NAVIGACE ---
@@ -188,13 +181,16 @@ function showSection(id) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     document.getElementById('navMenu').classList.remove('active');
-
-    // Toggle KE SCHVALENI visibility
-    const adminApproveList = document.getElementById('adminApproveList');
-    if (id === 'admin') {
-        adminApproveList.style.display = 'block';
+    
+    // Zobrazení tlačítka + pouze v sekci GOSSIPS (feed)
+    const plusBtn = document.getElementById('inputToggle');
+    if (id === 'feed') {
+        plusBtn.style.display = 'block';
     } else {
-        adminApproveList.style.display = 'none';
+        plusBtn.style.display = 'none';
+        // Zavřít input area pokud se přepne sekce
+        document.getElementById('inputArea').classList.remove('open');
+        plusBtn.innerText = '+';
     }
 }
 
@@ -239,7 +235,7 @@ async function submitGossip() {
 
     const { error } = await _supabase.from('gossips').insert([{ person, content, image_url: imageUrl }]);
     if (!error) {
-        alert("Odesláno ke schválení!");
+        alert("Odesláno!");
         location.reload();
     }
 }
@@ -283,16 +279,15 @@ async function loadData() {
 
         if (item.approved) {
             feed.innerHTML += cardHtml;
-            // Statistiky pro ranking
             const pLower = item.person.toLowerCase();
             RANKED_PEOPLE.forEach(name => {
                 if (pLower.includes(name.toLowerCase())) stats[name.toLowerCase()]++;
             });
-            // Recent 24h
             if ((now - new Date(item.created_at)) < 24 * 60 * 60 * 1000) {
                 recent.innerHTML += cardHtml;
             }
         } else if (isAdmin) {
+            // ZDE se nápis KE SCHVÁLENÍ ukazuje pouze pro admina
             adminList.innerHTML += `
                 <div class="card" style="border-color:orange">
                     <b>${item.person}</b>: ${item.content}
@@ -303,7 +298,6 @@ async function loadData() {
         }
     });
 
-    // Vykreslení Rankingu
     const sorted = RANKED_PEOPLE.sort((a,b) => stats[b.toLowerCase()] - stats[a.toLowerCase()]);
     rankingList.innerHTML = sorted.map((name, i) => `
         <div class="card" style="display:flex; justify-content:space-between">
@@ -314,8 +308,7 @@ async function loadData() {
 }
 
 async function likePost(id, currentLikes) {
-    if (localStorage.getItem('liked_' + id)) return; // Prevence glitchování
-    
+    if (localStorage.getItem('liked_' + id)) return;
     localStorage.setItem('liked_' + id, 'true');
     const { error } = await _supabase.from('gossips').update({ likes: currentLikes + 1 }).eq('id', id);
     if (!error) loadData();
@@ -333,10 +326,11 @@ async function deletePost(id) {
     }
 }
 
-// Spuštění
 loadData();
-// Auto refresh každých 30s
 setInterval(loadData, 30000);
+
+// Nastavení správné viditelnosti tlačítka hned po načtení (podle aktivní sekce)
+showSection('recent');
 </script>
 
 </body>
