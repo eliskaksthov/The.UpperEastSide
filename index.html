@@ -57,8 +57,8 @@
         .admin-only { display: none !important; }
         body.is-admin .admin-only { display: block !important; }
 
-        .content { padding: 80px 20px 60px; max-width: 500px; margin: auto; }
-        #recent.active { max-width: 900px; } 
+        /* UPRAVENO: Kontejner je nyní flexibilní */
+        .content { padding: 80px 20px 60px; width: 100%; max-width: 500px; margin: auto; transition: max-width 0.3s; }
 
         .section { display: none; }
         .section.active { display: block; }
@@ -68,6 +68,7 @@
             backdrop-filter: blur(6px);
             border: 1px solid var(--border); border-radius: 15px; 
             padding: 15px; margin-bottom: 15px;
+            width: 100%;
         }
 
         .hero-card {
@@ -81,8 +82,15 @@
         .gossip-img { 
             width: 100%; border-radius: 10px; margin: 10px 0; display: block; 
             cursor: pointer; transition: opacity 0.2s;
+            object-fit: contain; /* Zajišťuje nedeformování */
         }
         .gossip-img:hover { opacity: 0.9; }
+
+        /* NOVÉ: Pravidla pro PC (šířka příspěvků) */
+        @media (min-width: 1024px) {
+            .content { max-width: 1200px; } /* Roztažení kontejneru na PC */
+            .hero-card .gossip-img { max-height: 70vh; } /* Aby nebyl obrázek vyšší než obrazovka */
+        }
 
         .person { color: var(--accent); font-size: 14px; font-weight: bold; text-transform: uppercase; }
         .post-time { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
@@ -273,7 +281,6 @@ async function loadData() {
                 if (pLower.includes(name.toLowerCase())) stats[name.toLowerCase()]++;
             });
         } else if (isAdmin) {
-            // ADMIN CARD - Nyní včetně obrázku ke schválení
             adminList.innerHTML += `
                 <div class="card" style="border: 1px solid orange">
                     <div class="person">${item.person}</div>
