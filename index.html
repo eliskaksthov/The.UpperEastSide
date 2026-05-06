@@ -458,7 +458,7 @@ document.getElementById('postBtn').onclick = async () => {
 
     await push(gossipRef, {
         text, person, image: base64,
-        time: new Date().toLocaleString('cs-CZ'),
+        time: Date.now(),
         approved: false, likes: 0
     });
     alert("The post has been submitted for approval.");
