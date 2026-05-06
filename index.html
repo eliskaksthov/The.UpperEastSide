@@ -1,551 +1,266 @@
 <!DOCTYPE html>
-
 <html lang="cs">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <title>Insider</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-    <style>
-        :root { 
-            --bg: #080808; 
-            --surface: #111111; 
-            --accent: #ff2d55;
-            --accent-good: #30d158;
-            --text: #ffffff; 
-            --muted: #555; 
-            --border: #222; 
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Insider</title>
 
-```
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    
-    body { 
-        font-family: 'DM Sans', sans-serif; 
-        background-color: var(--bg);
-        background-repeat: no-repeat;
-        background-position: center center;
-        background-attachment: fixed;
-        background-size: cover;
-        image-rendering: high-quality;
-        -webkit-font-smoothing: antialiased;
-        color: var(--text); 
-        min-height: 100vh; 
-    }
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
-    .header { 
-        position: fixed; top: 0; left: 0; right: 0; z-index: 100; 
-        background: rgba(8,8,8,0.75);
-        backdrop-filter: blur(8px); 
-        -webkit-backdrop-filter: blur(8px);
-        border-bottom: 1px solid var(--border); 
-        padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; 
-    }
+<style>
+:root { 
+    --bg: #080808; 
+    --surface: #111; 
+    --accent: #ff2d55;
+    --text: #fff; 
+    --muted: #666; 
+    --border: #222; 
+}
 
-    /* =============================================
-       LOGO
-       Bebas Neue vždy velká. Pro malá změň na 'DM Sans'.
-       ============================================= */
-    .logo { 
-        font-family: 'DM Sans', sans-serif; 
-        font-size: 28px; 
-        letter-spacing: 0px; 
-        color: var(--accent); 
-    }
-    .nav-toggle { font-size: 28px; cursor: pointer; color: white; background: none; border: none; }
-    
-    .menu { 
-        display: none; position: fixed; top: 60px; right: 20px; 
-        background: var(--surface); border: 1px solid var(--border); 
-        border-radius: 12px; padding: 10px; z-index: 1000; 
-        flex-direction: column; gap: 5px; min-width: 180px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
-    .menu.active { display: flex; }
-    .menu button { 
-        background: none; border: none; color: white; padding: 12px 15px; 
-        text-align: left; cursor: pointer; font-family: 'Bebas Neue', sans-serif; 
-        font-size: 18px; border-radius: 8px; transition: 0.2s;
-    }
-    .menu button:hover { background: var(--border); color: var(--accent); }
+* {
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    touch-action: manipulation;
+}
 
-    .admin-only { display: none !important; }
-    body.is-admin .admin-only { display: block !important; }
-    body.is-admin #loginBtn { display: none !important; }
+body {
+    font-family:'DM Sans';
+    background:var(--bg);
+    color:var(--text);
+}
 
-    .content { 
-        padding: 80px 20px 60px; 
-        max-width: 500px; 
-        margin: auto; 
-        transition: padding-bottom 0.4s ease;
-    }
-    .content.input-visible { padding-bottom: 200px; }
+.header {
+    position:fixed;
+    top:0;
+    width:100%;
+    background:#111;
+    padding:15px;
+    display:flex;
+    justify-content:space-between;
+}
 
-    .section { display: none; animation: fadeIn 0.4s ease; }
-    .section.active { display: block; }
+.content {
+    padding:80px 15px;
+    max-width:500px;
+    margin:auto;
+}
 
-    .card { 
-        background: rgba(17, 17, 17, 0.82);
-        backdrop-filter: blur(6px);
-        -webkit-backdrop-filter: blur(6px);
-        border: 1px solid var(--border); border-radius: 15px; 
-        padding: 15px; margin-bottom: 15px; 
-    }
+.section { display:none; }
+.section.active { display:block; }
 
-    .gossip-img { 
-        width: 100%; 
-        max-height: 400px;
-        object-fit: cover;
-        object-position: center top;
-        border-radius: 10px; 
-        margin: 10px 0; 
-        display: block; 
-    }
+.card {
+    background:#151515;
+    padding:15px;
+    border-radius:15px;
+    margin-bottom:12px;
+}
 
-    .person { 
-        color: var(--accent); 
-        font-size: 14px; 
-        font-weight: bold; 
-        margin-bottom: 3px; 
-        text-transform: uppercase; 
-    }
+.person { color:var(--accent); }
 
-    /* Čas napsání */
-    .post-time {
-        font-size: 11px;
-        color: var(--muted);
-        margin-bottom: 8px;
-        letter-spacing: 0.3px;
-    }
+.time { font-size:12px; color:var(--muted); }
 
-    .section-title {
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 32px;
-        margin-bottom: 6px;
-    }
-    .section-subtitle {
-        color: var(--muted);
-        font-size: 13px;
-        margin-bottom: 20px;
-    }
+img {
+    width:100%;
+    border-radius:10px;
+    margin-top:10px;
+}
 
-    /* Pulzující tečka pro Feed */
-    .live-dot {
-        display: inline-block;
-        width: 7px;
-        height: 7px;
-        background: var(--accent);
-        border-radius: 50%;
-        margin-right: 6px;
-        animation: pulse 1.5s infinite;
-        vertical-align: middle;
-        position: relative;
-        top: -2px;
-    }
-    @keyframes pulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.4; transform: scale(0.85); }
-    }
+button {
+    background:var(--accent);
+    border:none;
+    color:white;
+    padding:6px 12px;
+    border-radius:20px;
+    margin-top:8px;
+}
 
-    .empty-state {
-        text-align: center;
-        color: var(--muted);
-        padding: 40px 20px;
-        font-size: 14px;
-    }
+.input-area {
+    position:fixed;
+    bottom:0;
+    width:100%;
+    background:#111;
+    padding:10px;
+}
 
-    .ranking-title {
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 32px;
-        margin-bottom: 6px;
-    }
-    .ranking-subtitle {
-        color: var(--muted);
-        font-size: 13px;
-        margin-bottom: 20px;
-    }
-    .rank-item { 
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 15px; background: rgba(255,255,255,0.05); 
-        border-radius: 10px; margin-bottom: 8px;
-        border-left: 4px solid var(--border);
-    }
-    .rank-position { 
-        font-family: 'Bebas Neue', sans-serif; 
-        font-size: 28px; 
-        color: var(--muted); 
-        margin-right: 12px; 
-        min-width: 30px;
-    }
-    .rank-count { 
-        font-weight: bold; 
-        font-size: 16px; 
-        color: var(--accent);
-        text-align: right;
-    }
-
-    .login-input {
-        margin-bottom: 10px;
-        width: 100%;
-        background: var(--surface);
-        border: 1px solid var(--border);
-        color: white;
-        padding: 12px;
-        border-radius: 10px;
-        outline: none;
-        font-family: 'DM Sans', sans-serif;
-    }
-
-    .input-toggle-btn {
-        position: fixed;
-        bottom: 18px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 200;
-        background: rgba(17,17,17,0.75);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid var(--border);
-        color: white;
-        width: 46px;
-        height: 46px;
-        border-radius: 50%;
-        font-size: 18px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: bottom 0.4s cubic-bezier(0.4,0,0.2,1), background 0.2s;
-    }
-    .input-toggle-btn.open { bottom: 155px; }
-    .input-toggle-btn:hover { background: rgba(40,40,40,0.9); }
-
-    .arrow-svg {
-        width: 18px;
-        height: 18px;
-        transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
-    }
-    .input-toggle-btn.open .arrow-svg { transform: rotate(180deg); }
-
-    .input-area { 
-        position: fixed; bottom: 0; left: 0; right: 0; 
-        background: rgba(8,8,8,0.60);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border-top: 1px solid var(--border); 
-        padding: 15px 15px 22px;
-        z-index: 101;
-        transform: translateY(100%);
-        transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
-    }
-    .input-area.open { transform: translateY(0); }
-
-    .input-container { max-width: 500px; margin: auto; display: flex; flex-direction: column; gap: 8px; }
-
-    input[type="text"] { 
-        background: rgba(255,255,255,0.07);
-        border: 1px solid var(--border); 
-        color: white; padding: 12px; border-radius: 10px; outline: none;
-        font-family: 'DM Sans', sans-serif;
-        width: 100%;
-    }
-    input[type="text"]::placeholder { color: var(--muted); }
-
-    .post-btn { 
-        background: var(--accent); color: white; border: none; 
-        padding: 12px; border-radius: 10px; font-family: 'Bebas Neue', sans-serif; 
-        cursor: pointer; font-size: 18px; letter-spacing: 1px;
-    }
-
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+input {
+    width:100%;
+    margin-bottom:6px;
+    padding:10px;
+    border-radius:10px;
+    border:none;
+}
 </style>
-```
-
 </head>
+
 <body>
 
 <div class="header">
-    <div class="logo">Insider</div>
-    <button class="nav-toggle" onclick="toggleMenu()">&#9776;</button>
-</div>
-
-<div class="menu" id="navMenu">
-    <button onclick="showSection('feed')">GOSSIPS</button>
-    <button onclick="showSection('recent')">FEED</button>
-    <button onclick="showSection('ranking')">RANKING</button>
-    <button id="loginBtn" onclick="showSection('login')">LOGIN</button>
-    <button class="admin-only" onclick="showSection('admin')">ADMIN</button>
-    <button class="admin-only" onclick="logout()" style="color: var(--accent);">LOG OUT</button>
-</div>
-
-<div class="content" id="mainContent">
-
-```
-<!-- GOSSIPS — všechny schválené -->
-<div id="feed" class="section active">
-    <div id="gossipFeed">Loading...</div>
-</div>
-
-<!-- FEED — posledních 24 hodin -->
-<div id="recent" class="section">
-    <div class="section-title"><span class="live-dot"></span>Feed</div>
-    <div class="section-subtitle">gossips from the last 24 hours</div>
-    <div id="recentFeed">Loading...</div>
-</div>
-
-<div id="ranking" class="section">
-    <div class="ranking-title">The Ranking</div>
-    <div class="ranking-subtitle">vymysli si popisek</div>
-    <div id="rankingList"></div>
-</div>
-
-<div id="login" class="section">
-    <div class="card">
-        <h2 style="font-family:'Bebas Neue'; margin-bottom:15px;">ADMIN LOGIN</h2>
-        <input class="login-input" type="text" id="adminUser" placeholder="Username">
-        <input class="login-input" type="password" id="adminPass" placeholder="Password">
-        <button class="post-btn" onclick="handleLogin()" style="width: 100%;">LOG IN</button>
+    <b>Insider</b>
+    <div>
+        <button onclick="show('recent')">Feed</button>
+        <button onclick="show('feed')">Gossips</button>
+        <button onclick="show('ranking')">Ranking</button>
     </div>
 </div>
 
-<div id="admin" class="section admin-only">
-    <h2 style="font-family:'Bebas Neue'; margin-bottom:15px;">ADMIN</h2>
-    <div id="adminApproveList"></div>
-</div>
-```
+<div class="content">
+
+<!-- FEED = MAIN -->
+<div id="recent" class="section active"></div>
+
+<!-- ALL -->
+<div id="feed" class="section"></div>
+
+<!-- RANKING -->
+<div id="ranking" class="section"></div>
 
 </div>
 
-<button class="input-toggle-btn" id="inputToggle" onclick="toggleInputArea()">
-    <svg class="arrow-svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="18 15 12 9 6 15"></polyline>
-    </svg>
-</button>
-
-<div class="input-area" id="inputArea">
-    <div class="input-container">
-        <input type="text" id="personInput" placeholder="Who was it about?">
-        <input type="text" id="gossipInput" placeholder="What happened?">
-        <div style="display: flex; gap: 10px;">
-            <label style="background:rgba(255,255,255,0.07); padding:12px; border-radius:10px; cursor:pointer; flex:1; text-align:center; border:1px solid var(--border); font-size:14px;" id="photoLabel">
-                FOTO
-                <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="document.getElementById('photoLabel').innerText='FOTO OK'">
-            </label>
-            <button class="post-btn" id="postBtn" style="flex:2">SEND</button>
-        </div>
-    </div>
+<div class="input-area">
+    <input id="person" placeholder="Who">
+    <input id="text" placeholder="Gossip">
+    <input type="file" id="file">
+    <input id="adminPass" placeholder="Admin key (optional)">
+    <button onclick="send()">SEND</button>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, push, onValue, update, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
+/* 🔴 VLOŽ SVÉ FIREBASE /
 const firebaseConfig = {
-    apiKey: "SEM_VLOZ_SVOJE_API",
-    authDomain: "the-list-1efde.firebaseapp.com",
-    databaseURL: "https://the-list-1efde-default-rtdb.europe-west1.firebasedatabase.app"
+    apiKey: "SEM_API",
+    authDomain: "xxx.firebaseapp.com",
+    databaseURL: "https://xxx-default-rtdb.europe-west1.firebasedatabase.app"
 };
 
 const app = initializeApp(firebaseConfig);
-const db  = getDatabase(app);
-const gossipRef = ref(db, 'gossip');
+const db = getDatabase(app);
+const gossipRef = ref(db, "gossip");
 
-const RANKED_PEOPLE = ["Lily", "Mason", "Alison", "Katie", "James"];
+/ ADMIN /
+const ADMIN_KEY = "123456";
+let isAdmin = localStorage.getItem("admin") === ADMIN_KEY;
 
-const ADMIN_USER = "admin"; 
-const ADMIN_PASS = "1234";
+/ NAV /
+let current = "recent";
+window.show = (s)=>{ current=s; render(); };
 
-window.handleLogin = () => {
-    const u = document.getElementById('adminUser').value;
-    const p = document.getElementById('adminPass').value;
-    if (u === ADMIN_USER && p === ADMIN_PASS) {
-        localStorage.setItem('isAdmin', 'true');
-        location.reload();
-    } else { alert("Wrong username or password!"); }
-};
-window.logout = () => { localStorage.removeItem('isAdmin'); location.reload(); };
-
-const isAdmin = localStorage.getItem('isAdmin') === 'true';
-if (isAdmin) document.body.classList.add('is-admin');
-
-const globalDefaultBg = "https://i.imgur.com/BBWTLg6.jpeg";
-document.body.style.backgroundImage = `url(${globalDefaultBg})`;
-
-window.toggleMenu = () => document.getElementById('navMenu').classList.toggle('active');
-
-window.showSection = (id) => {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    document.getElementById('navMenu').classList.remove('active');
-    const toggleBtn = document.getElementById('inputToggle');
-    if (id === 'feed' || id === 'recent') {
-        toggleBtn.style.display = 'flex';
-    } else {
-        toggleBtn.style.display = 'none';
-        closeInputArea();
-    }
-};
-
-let inputOpen = false;
-window.toggleInputArea = () => {
-    inputOpen = !inputOpen;
-    const area    = document.getElementById('inputArea');
-    const btn     = document.getElementById('inputToggle');
-    const content = document.getElementById('mainContent');
-    if (inputOpen) {
-        area.classList.add('open');
-        btn.classList.add('open');
-        content.classList.add('input-visible');
-    } else {
-        closeInputArea();
-    }
-};
-
-function closeInputArea() {
-    inputOpen = false;
-    document.getElementById('inputArea').classList.remove('open');
-    document.getElementById('inputToggle').classList.remove('open');
-    document.getElementById('mainContent').classList.remove('input-visible');
-}
-
-// Sestaví HTML jedné karty; DELETE jen pro admina
-function buildCard(id, item, showDelete) {
-    const likes = item.likes || 0;
-    const timeHtml = item.time 
-        ? `<div class="post-time">${item.time}</div>` 
-        : '';
-    return `
-        <div class="card">
-            <div class="person">${item.person}</div>
-            ${timeHtml}
-            <div style="line-height:1.5">${item.text}</div>
-            ${item.image ? `<img src="${item.image}" class="gossip-img" loading="lazy">` : ""}
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px;">
-                <button class="post-btn" style="padding:5px 15px; font-size:14px;" onclick="likePost('${id}', ${likes})">
-                    ${likes} likes
-                </button>
-                ${showDelete ? `<button onclick="deletePost('${id}')" style="background:none; border:none; color:#555; cursor:pointer; font-size:14px; font-family:'Bebas Neue'">DELETE</button>` : ""}
-            </div>
-        </div>`;
-}
-
-// Parsuje český formát "6. 5. 2026 14:30:00"
-function parseTime(timeStr) {
-    if (!timeStr) return null;
-    try {
-        const d = new Date(timeStr);
-        if (!isNaN(d)) return d;
-        const m = timeStr.match(/(\d+)\.\s*(\d+)\.\s*(\d+)\s+(\d+):(\d+):(\d+)/);
-        if (m) return new Date(+m[3], +m[2]-1, +m[1], +m[4], +m[5], +m[6]);
-    } catch(e) {}
-    return null;
-}
-
-document.getElementById('postBtn').onclick = async () => {
-    const text   = document.getElementById('gossipInput').value.trim();
-    const person = document.getElementById('personInput').value.trim();
-    const file   = document.getElementById('fileInput').files[0];
-    if (!text || !person) return alert("Write name and gossip!");
-
-    let base64 = "";
-    if (file) {
-        base64 = await new Promise(res => {
-            const reader = new FileReader();
-            reader.onload = () => res(reader.result);
-            reader.readAsDataURL(file);
-        });
-    }
-
-    await push(gossipRef, {
-        text, person, image: base64,
-        time: Date.now(),
-        approved: false, likes: 0
+/ IMAGE COMPRESS /
+function compress(file){
+    return new Promise(res=>{
+        const img=new Image();
+        const url=URL.createObjectURL(file);
+        img.onload=()=>{
+            const canvas=document.createElement("canvas");
+            let w=img.width,h=img.height;
+            if(w>600){h=600/w;w=600;}
+            canvas.width=w; canvas.height=h;
+            canvas.getContext("2d").drawImage(img,0,0,w,h);
+            res(canvas.toDataURL("image/jpeg",0.6));
+        };
+        img.src=url;
     });
-    alert("The post has been submitted for approval.");
-    location.reload();
+}
+
+/* SEND /
+window.send = async ()=>{
+    const text=document.getElementById("text").value;
+    const person=document.getElementById("person").value;
+    const file=document.getElementById("file").files[0];
+    const key=document.getElementById("adminPass").value;
+
+    if(key===ADMIN_KEY){
+        localStorage.setItem("admin",ADMIN_KEY);
+        isAdmin=true;
+    }
+
+    let image="";
+    if(file) image=await compress(file);
+
+    await push(gossipRef,{
+        text, person, image,
+        time: Date.now(),
+        approved: isAdmin,
+        likes:0
+    });
+
+    document.getElementById("text").value="";
+    document.getElementById("person").value="";
+    document.getElementById("file").value="";
 };
 
-window.likePost    = (id, cur) => update(ref(db, 'gossip/' + id), { likes: (cur || 0) + 1 });
-window.approvePost = (id)      => update(ref(db, 'gossip/' + id), { approved: true });
-window.deletePost  = (id)      => confirm("Smazat?") && remove(ref(db, 'gossip/' + id));
+/ LIKE FIX (NO GLITCH) /
+const cooldown=new Set();
 
-onValue(gossipRef, (snapshot) => {
-    const data = snapshot.val() || {};
-    const feed       = document.getElementById('gossipFeed');
-    const recentDiv  = document.getElementById('recentFeed');
-    const rankingDiv = document.getElementById('rankingList');
-    const adminDiv   = document.getElementById('adminApproveList');
+window.like=(id,btn)=>{
+    if(cooldown.has(id)) return;
+    cooldown.add(id);
 
-    feed.innerHTML      = "";
-    recentDiv.innerHTML = "";
-    adminDiv.innerHTML  = "<h3 style='margin:20px 0 10px; font-family:Bebas Neue; color:var(--accent)'>Waiting for approval.:</h3>";
+    runTransaction(ref(db,'gossip/'+id+'/likes'), c=>(c||0)+1)
+    .then(r=>{
+        btn.innerText="❤️ "+r.snapshot.val();
+    })
+    .finally(()=>{
+        setTimeout(()=>cooldown.delete(id),800);
+    });
+};
 
-    const mentionCount = {};
-    RANKED_PEOPLE.forEach(n => { mentionCount[n.toLowerCase()] = 0; });
+/ APPROVE /
+window.approve=id=>{
+    update(ref(db,'gossip/'+id),{approved:true});
+};
 
-    const now   = Date.now();
-    const ms24h = 24 * 60 * 60 * 1000;
-    let recentCount = 0;
+/ DATA /
+let DATA={};
 
-    Object.entries(data).reverse().forEach(([id, item]) => {
-        const personText = (item.person || "").toLowerCase();
+onValue(gossipRef,snap=>{
+    DATA=snap.val()||{};
+    render();
+});
 
-        if (item.approved) {
-            RANKED_PEOPLE.forEach(name => {
-                if (personText.includes(name.toLowerCase())) {
-                    mentionCount[name.toLowerCase()]++;
-                }
-            });
+/ RENDER */
+function render(){
+    const feed=document.getElementById("feed");
+    const recent=document.getElementById("recent");
+    const ranking=document.getElementById("ranking");
 
-            // GOSSIPS — všechny schválené, DELETE jen admin
-            feed.innerHTML += buildCard(id, item, isAdmin);
+    feed.innerHTML="";
+    recent.innerHTML="";
+    ranking.innerHTML="";
 
-            // FEED — jen posledních 24h
-            const postTime = parseTime(item.time);
-            if (postTime && (now - postTime.getTime()) < ms24h) {
-                recentDiv.innerHTML += buildCard(id, item, isAdmin);
-                recentCount++;
-            }
+    const now=Date.now();
+    const map={};
 
-        } else if (isAdmin) {
-            adminDiv.innerHTML += `
-                <div class="card" style="border-color: var(--accent)">
-                    ${item.time ? `<div class="post-time">${item.time}</div>` : ''}
-                    <b>${item.person}</b>: ${item.text}
-                    ${item.image ? `<img src="${item.image}" class="gossip-img">` : ""}
-                    <div style="margin-top:10px; display:flex; gap:10px;">
-                        <button class="post-btn" style="flex:1; background:#28a745; font-size:14px" onclick="approvePost('${id}')">APPROVE</button>
-                        <button class="post-btn" style="flex:1; background:#dc3545; font-size:14px" onclick="deletePost('${id}')">DELETE</button>
-                    </div>
-                </div>`;
+    Object.entries(DATA).reverse().forEach(([id,p])=>{
+
+        if(!p.approved && !isAdmin) return;
+
+        const el=document.createElement("div");
+        el.className="card";
+
+        el.innerHTML=             <div class="person">${p.person}</div>             <div class="time">${new Date(p.time).toLocaleString()}</div>             <div>${p.text}</div>             ${p.image?<img src="${p.image}">:""}             <button onclick="like('${id}',this)">❤️ ${p.likes||0}</button>             ${isAdmin && !p.approved ? <button onclick="approve('${id}')">Approve</button>: ""}        ;
+
+        feed.appendChild(el.cloneNode(true));
+
+        if(now - p.time < 86400000){
+            recent.appendChild(el);
+        }
+
+        if(p.approved){
+            map[p.person]=(map[p.person]||0)+(p.likes||0);
         }
     });
 
-    if (recentCount === 0) {
-        recentDiv.innerHTML = `<div class="empty-state">No gossips in the last 24 hours </div>`;
-    }
-    if (feed.innerHTML === "") {
-        feed.innerHTML = `<div class="empty-state">No gossips yet</div>`;
-    }
-
-    // RANKING
-    const sorted = RANKED_PEOPLE
-        .map(name => [name, mentionCount[name.toLowerCase()] || 0])
-        .sort((a, b) => b[1] - a[1]);
-
-    rankingDiv.innerHTML = sorted.map(([name, count], i) => {
-        const countText = count === 1 ? '1 zminka' : `${count} zminek`;
-        return `
-        <div class="rank-item">
-            <div style="display:flex; align-items:center; gap:8px;">
-                <span class="rank-position">${i + 1}</span>
-                <div style="font-weight:bold;">${name}</div>
-            </div>
-            <span class="rank-count">${countText}</span>
-        </div>`;
-    }).join('');
-});
+    Object.entries(map)
+    .sort((a,b)=>b[1]-a[1])
+    .forEach(([name,score],i)=>{
+        ranking.innerHTML+=         <div class="card">             #${i+1} ${name} — ❤️ ${score}         </div>;
+    });
+}
 </script>
 
 </body>
-</html>
+</htm
