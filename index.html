@@ -166,19 +166,24 @@
 </div>
 
 <script>
+
 // --- KONFIGURACE ---
 const SUPABASE_URL = 'https://rfpsagdsxqstbvtdcsmy.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_QAlABDjRq-eDetfcgWC6xA_vQz21wrG';
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const ADMIN_PASS = "1234"; // Změň si
+const ADMIN_PASS = "1234"; 
 const RANKED_PEOPLE = ["Lily", "Mason", "Alison", "Katie", "James"];
 
 // --- NAVIGACE ---
 function showSection(id) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
+    const target = document.getElementById(id);
+    if (target) target.classList.add('active');
     document.getElementById('navMenu').classList.remove('active');
+    
+    // Uložíme si, co má být otevřené, pro případ refreshe (volitelné)
+    localStorage.setItem('activeSection', id);
 }
 
 function toggleMenu() { document.getElementById('navMenu').classList.toggle('active'); }
@@ -208,7 +213,7 @@ async function submitGossip() {
     const content = document.getElementById('gossipInput').value.trim();
     const file = document.getElementById('fileInput').files[0];
 
-    if (!person || !content) return alert("Vyplň vše!");
+    if (!person || !content) return alert("Vyplň jméno i obsah!");
 
     let imageUrl = null;
     if (file) {
@@ -223,7 +228,8 @@ async function submitGossip() {
     const { error } = await _supabase.from('gossips').insert([{ person, content, image_url: imageUrl }]);
     if (!error) {
         alert("Odesláno ke schválení!");
-        location.reload();
+        toggleInputArea();
+        loadData(); // Hned aktualizujeme lokálně
     }
 }
 
@@ -252,14 +258,14 @@ async function loadData() {
             <div class="card">
                 <div class="person">${item.person}</div>
                 <div class="post-time">${new Date(item.created_at).toLocaleString('cs-CZ')}</div>
-                <div style="margin: 10px 0;">${item.content}</div>
-                ${item.image_url ? `<img src="${item.image_url}" class="gossip-img">` : ''}
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <button class="like-btn ${localStorage.getItem('liked_'+item.id) ? 'liked' : ''}" 
+                <div style="margin: 10px 0; line-height: 1.4;">${item.content}</div>
+                ${item.image_url ? `<img src="${item.image_url}" class="gossip-img" loading="lazy">` : ''}
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                    <button id="btn-${item.id}" class="like-btn ${localStorage.getItem('liked_'+item.id) ? 'liked' : ''}" 
                             onclick="likePost('${item.id}', ${item.likes})">
                         ${item.likes} LIKES
                     </button>
-                    ${isAdmin ? `<button onclick="deletePost('${item.id}')" style="color:red; background:none; border:none; font-family:'Bebas Neue'">Smazat</button>` : ''}
+                    ${isAdmin ? `<button onclick="deletePost('${item.id}')" style="color:red; background:none; border:none; font-family:'Bebas Neue'; cursor:pointer;">Smazat</button>` : ''}
                 </div>
             </div>
         `;
@@ -271,37 +277,50 @@ async function loadData() {
             RANKED_PEOPLE.forEach(name => {
                 if (pLower.includes(name.toLowerCase())) stats[name.toLowerCase()]++;
             });
-            // Recent 24h
+            // FEED 24H (Recent)
             if ((now - new Date(item.created_at)) < 24 * 60 * 60 * 1000) {
                 recent.innerHTML += cardHtml;
             }
         } else if (isAdmin) {
             adminList.innerHTML += `
-                <div class="card" style="border-color:orange">
+                <div class="card" style="border-left: 4px solid var(--accent)">
                     <b>${item.person}</b>: ${item.content}
-                    <button class="post-btn" style="margin-top:10px; background:green" onclick="approvePost('${item.id}')">SCHVÁLIT</button>
-                    <button class="post-btn" style="margin-top:5px; background:red" onclick="deletePost('${item.id}')">ZAMÍTNOUT</button>
+                    <div style="display:flex; gap:10px; margin-top:10px;">
+                        <button class="post-btn" style="background:green; font-size:14px" onclick="approvePost('${item.id}')">SCHVÁLIT</button>
+                        <button class="post-btn" style="background:red; font-size:14px" onclick="deletePost('${item.id}')">SMAZAT</button>
+                    </div>
                 </div>
             `;
         }
     });
 
+    if (recent.innerHTML === '') recent.innerHTML = '<div class="empty-state">Zatím žádné nové drby za 24h.</div>';
+
     // Vykreslení Rankingu
-    const sorted = RANKED_PEOPLE.sort((a,b) => stats[b.toLowerCase()] - stats[a.toLowerCase()]);
+    const sorted = [...RANKED_PEOPLE].sort((a,b) => stats[b.toLowerCase()] - stats[a.toLowerCase()]);
     rankingList.innerHTML = sorted.map((name, i) => `
-        <div class="card" style="display:flex; justify-content:space-between">
-            <span>${i+1}. ${name}</span>
-            <span style="color:var(--accent)">${stats[name.toLowerCase()]}×</span>
+        <div class="rank-item">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span class="rank-position">${i+1}</span>
+                <span style="font-weight:bold;">${name}</span>
+            </div>
+            <span class="rank-count">${stats[name.toLowerCase()]}×</span>
         </div>
     `).join('');
 }
 
 async function likePost(id, currentLikes) {
-    if (localStorage.getItem('liked_' + id)) return; // Prevence glitchování
+    if (localStorage.getItem('liked_' + id)) return;
     
+    // Okamžitá vizuální změna (proti glitchování)
     localStorage.setItem('liked_' + id, 'true');
-    const { error } = await _supabase.from('gossips').update({ likes: currentLikes + 1 }).eq('id', id);
-    if (!error) loadData();
+    const btn = document.getElementById('btn-' + id);
+    if(btn) {
+        btn.classList.add('liked');
+        btn.innerText = (currentLikes + 1) + " LIKES";
+    }
+
+    await _supabase.from('gossips').update({ likes: currentLikes + 1 }).eq('id', id);
 }
 
 async function approvePost(id) {
@@ -310,15 +329,20 @@ async function approvePost(id) {
 }
 
 async function deletePost(id) {
-    if (confirm("Opravdu smazat?")) {
+    if (confirm("Smazat příspěvek?")) {
         await _supabase.from('gossips').delete().eq('id', id);
         loadData();
     }
 }
 
-// Spuštění
-loadData();
-// Auto refresh každých 30s
+// --- START ---
+// Tady nastavíme, aby se po načtení ukázal FEED (recent)
+document.addEventListener('DOMContentLoaded', () => {
+    showSection('recent'); 
+    loadData();
+});
+
+// Auto-refresh každých 30 sekund
 setInterval(loadData, 30000);
 </script>
 
