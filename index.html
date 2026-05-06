@@ -181,7 +181,7 @@ function showSection(id) {
     document.getElementById(id).classList.add('active');
     document.getElementById('navMenu').classList.remove('active');
     
-    // Tlačítko + se ukáže JEN v sekci GOSSIPS (feed)
+    // Tlačítko + se ukáže JEN v sekci GOSSIPS
     const plusBtn = document.getElementById('inputToggle');
     if (id === 'feed') {
         plusBtn.style.display = 'block';
@@ -235,7 +235,7 @@ async function submitGossip() {
 
     const { error } = await _supabase.from('gossips').insert([{ person, content, image_url: imageUrl }]);
     if (!error) {
-        alert("Odesláno!");
+        alert("Odesláno ke schválení!");
         location.reload();
     }
 }
@@ -253,12 +253,17 @@ async function loadData() {
     const adminList = document.getElementById('adminApproveList');
     const rankingList = document.getElementById('rankingList');
 
-    feed.innerHTML = ''; recent.innerHTML = ''; adminList.innerHTML = '';
+    // Vyčistíme všechna pole
+    feed.innerHTML = ''; 
+    recent.innerHTML = ''; 
+    adminList.innerHTML = '';
     
     const stats = {};
     RANKED_PEOPLE.forEach(p => stats[p.toLowerCase()] = 0);
-
     const now = new Date();
+
+    // Zjistíme, která sekce je zrovna aktivní
+    const isAdminSectionActive = document.getElementById('admin').classList.contains('active');
 
     gossips.forEach(item => {
         const cardHtml = `
@@ -278,6 +283,7 @@ async function loadData() {
         `;
 
         if (item.approved) {
+            // Schválené příspěvky jdou do Feedů
             feed.innerHTML += cardHtml;
             const pLower = item.person.toLowerCase();
             RANKED_PEOPLE.forEach(name => {
@@ -286,19 +292,24 @@ async function loadData() {
             if ((now - new Date(item.created_at)) < 24 * 60 * 60 * 1000) {
                 recent.innerHTML += cardHtml;
             }
-       } else if (isAdmin && document.getElementById('admin').classList.contains('active')) {
-            // Pouze pro admina a pouze v sekci Admin (skrze JS logiku výše)
-            adminList.innerHTML += `
-                <div class="card" style="border-color:orange">
-                    <b>${item.person}</b>: ${item.content}
-                    <button class="post-btn" style="margin-top:10px; background:green" onclick="approvePost('${item.id}')">SCHVÁLIT</button>
-                    <button class="post-btn" style="margin-top:5px; background:red" onclick="deletePost('${item.id}')">ZAMÍTNOUT</button>
-                </div>
-            `;
+        } else {
+            // Neschválené příspěvky - ZOBRAZIT JEN POKUD JE ADMIN A JE V SEKCI ADMIN
+            if (isAdmin && isAdminSectionActive) {
+                adminList.innerHTML += `
+                    <div class="card" style="border: 2px solid orange">
+                        <div class="person">${item.person}</div>
+                        <div style="margin: 10px 0;">${item.content}</div>
+                        ${item.image_url ? `<img src="${item.image_url}" class="gossip-img">` : ''}
+                        <button class="post-btn" style="margin-top:10px; background:var(--accent-good)" onclick="approvePost('${item.id}')">SCHVÁLIT</button>
+                        <button class="post-btn" style="margin-top:5px; background:var(--accent)" onclick="deletePost('${item.id}')">ZAMÍTNOUT</button>
+                    </div>
+                `;
+            }
         }
     });
 
-    const sorted = RANKED_PEOPLE.sort((a,b) => stats[b.toLowerCase()] - stats[a.toLowerCase()]);
+    // Ranking zůstává stejný
+    const sorted = [...RANKED_PEOPLE].sort((a,b) => stats[b.toLowerCase()] - stats[a.toLowerCase()]);
     rankingList.innerHTML = sorted.map((name, i) => `
         <div class="card" style="display:flex; justify-content:space-between">
             <span>${i+1}. ${name}</span>
@@ -320,18 +331,18 @@ async function approvePost(id) {
 }
 
 async function deletePost(id) {
-    if (confirm("Opravdu smazat?")) {
+    if (confirm("Opravdu smazat/zamítnout?")) {
         await _supabase.from('gossips').delete().eq('id', id);
         loadData();
     }
 }
 
+// Spuštění
 loadData();
 setInterval(loadData, 30000);
-
-// Spouštíme na úvodní stránce
 showSection('recent');
 </script>
+
 
 </body>
 </html>
