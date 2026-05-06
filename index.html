@@ -85,11 +85,8 @@
             font-size: 18px; border-radius: 8px;
         }
 
-        /* OPRAVA: Viditelnost v menu */
         .admin-only { display: none !important; }
         body.is-admin .admin-only { display: block !important; }
-        
-        /* Skrytí Login tlačítka, když je uživatel admin */
         body.is-admin .guest-only { display: none !important; }
 
         .content { padding: 80px 20px 60px; width: 100%; max-width: 500px; margin: auto; transition: max-width 0.3s; }
@@ -337,7 +334,7 @@ function renderGossips(gossips, filter = '') {
                 <div class="btn-row">
                     <button class="like-btn ${localStorage.getItem('liked_'+item.id) ? 'liked' : ''}" onclick="likePost('${item.id}', ${item.likes})">${item.likes} LIKES</button>
                     <button class="comm-btn" onclick="toggleComments('${prefix}', '${item.id}', ${allowWriting})">${commentCount} COMMENTS</button>
-                    ${isAdmin ? `<button onclick="deletePost('${item.id}')" style="color:var(--accent); background:none; border:none; font-family:'Bebas Neue'; cursor:pointer;">SMAZAT</button>` : ''}
+                    ${isAdmin ? `<button onclick="deletePost('${item.id}', true)" style="color:var(--accent); background:none; border:none; font-family:'Bebas Neue'; cursor:pointer;">SMAZAT</button>` : ''}
                 </div>
                 <div class="comments-box" id="${prefix}-box-${item.id}">
                     <div id="${prefix}-list-${item.id}"></div>
@@ -367,7 +364,7 @@ function renderGossips(gossips, filter = '') {
                     ${item.image_url ? `<img src="${item.image_url}" class="gossip-img" onclick="openLightbox('${item.image_url}')">` : ''}
                     <div class="btn-row">
                         <button class="post-btn" style="background:var(--accent-good); width:auto;" onclick="approvePost('${item.id}')">SCHVÁLIT</button>
-                        <button class="post-btn" style="width:auto;" onclick="deletePost('${item.id}')">SMAZAT</button>
+                        <button class="post-btn" style="width:auto;" onclick="deletePost('${item.id}', false)">SMAZAT</button>
                     </div>
                 </div>
             `;
@@ -419,7 +416,7 @@ async function toggleComments(prefix, id, allowWriting) {
             <div class="comment">
                 <div style="font-size:10px; color:var(--muted)">${new Date(c.created_at).toLocaleTimeString('cs-CZ')}</div>
                 ${c.content}
-                ${isAdmin ? `<span style="color:red; cursor:pointer; position:absolute; right:10px; top:10px;" onclick="deleteComment('${c.id}', '${id}', '${prefix}', ${allowWriting})">×</span>` : ''}
+                ${isAdmin ? `<span style="color:red; cursor:pointer; position:absolute; right:10px; top:10px;" onclick="deleteComment('${c.id}')">×</span>` : ''}
             </div>
         `).join('') : '<div style="font-size:12px; color:var(--muted); text-align:center; padding:10px;">Zatím žádné komentáře.</div>';
     }
@@ -434,8 +431,8 @@ async function sendComment(prefix, gossipId) {
     loadData(); 
 }
 
-async function deleteComment(cId, gId, prefix, allowWriting) {
-    if (!confirm("Smazat komentář?")) return;
+async function deleteComment(cId) {
+    // Odstraněno confirm
     await _supabase.from('gossip_comments').delete().eq('id', cId);
     loadData();
 }
@@ -452,18 +449,22 @@ async function approvePost(id) {
     loadData();
 }
 
-async function deletePost(id) {
-    if (confirm("Smazat příspěvek?")) {
-        await _supabase.from('gossips').delete().eq('id', id);
-        loadData();
+async function deletePost(id, isFeed) {
+    // Pokud mažu z feedu (isFeed == true), zeptám se. Pokud z admina (ke schválení), smažu rovnou.
+    if (isFeed) {
+        if (!confirm("Smazat příspěvek?")) return;
     }
+    
+    await _supabase.from('gossips').delete().eq('id', id);
+    loadData();
 }
 
 async function submitGossip() {
     const person = document.getElementById('personInput').value.trim();
     const content = document.getElementById('gossipInput').value.trim();
     const file = document.getElementById('fileInput').files[0];
-    if (!person || !content) return alert("Vyplň vše!");
+    if (!person || !content) return; // Odstraněn alert
+
     let imageUrl = null;
     if (file) {
         const fileExt = file.name.split('.').pop();
@@ -472,7 +473,8 @@ async function submitGossip() {
         if (data) imageUrl = `${SUPABASE_URL}/storage/v1/object/public/gossip-images/${fileName}`;
     }
     await _supabase.from('gossips').insert([{ person, content, image_url: imageUrl }]);
-    alert("Odesláno ke schválení!");
+    
+    // Odstraněn alert o odeslání
     location.reload();
 }
 
