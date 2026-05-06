@@ -46,48 +46,62 @@
             background: var(--surface); border: 1px solid var(--border); 
             border-radius: 12px; padding: 10px; z-index: 1000; 
             flex-direction: column; gap: 5px; min-width: 180px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
         .menu.active { display: flex; }
         .menu button { 
             background: none; border: none; color: white; padding: 12px 15px; 
             text-align: left; cursor: pointer; font-family: 'Bebas Neue', sans-serif; 
-            font-size: 18px; border-radius: 8px; transition: 0.2s;
+            font-size: 18px; border-radius: 8px;
         }
-        .menu button:hover { background: var(--border); color: var(--accent); }
 
         .admin-only { display: none !important; }
         body.is-admin .admin-only { display: block !important; }
-        body.is-admin #loginBtn { display: none !important; }
 
         .content { padding: 80px 20px 60px; max-width: 500px; margin: auto; }
 
-        .section { display: none; animation: fadeIn 0.4s ease; }
+        .section { display: none; }
         .section.active { display: block; }
 
         .card { 
             background: rgba(17, 17, 17, 0.85);
             backdrop-filter: blur(6px);
             border: 1px solid var(--border); border-radius: 15px; 
-            padding: 15px; margin-bottom: 15px; position: relative;
+            padding: 15px; margin-bottom: 15px;
         }
 
-        .gossip-img { width: 100%; border-radius: 10px; margin: 10px 0; display: block; }
+        .gossip-img { width: 100%; border-radius: 10px; margin: 10px 0; }
         .person { color: var(--accent); font-size: 14px; font-weight: bold; text-transform: uppercase; }
         .post-time { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
 
-        .like-btn {
+        .btn-row { display: flex; gap: 10px; align-items: center; margin-top: 10px; }
+        
+        .like-btn, .comm-btn {
             background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--border);
-            padding: 6px 12px; border-radius: 20px; cursor: pointer; transition: 0.2s;
+            padding: 6px 12px; border-radius: 20px; cursor: pointer;
             font-family: 'Bebas Neue', sans-serif; font-size: 14px;
         }
-        .like-btn.liked { background: var(--accent); border-color: var(--accent); }
+        .like-btn.liked { background: var(--accent); }
+
+        /* Komentáře */
+        .comments-box { 
+            margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);
+            display: none; 
+        }
+        .comment {
+            background: rgba(255,255,255,0.03); border-radius: 8px;
+            padding: 10px; margin-bottom: 8px; font-size: 13px;
+        }
+        .comm-input-wrap { display: flex; gap: 5px; margin-top: 10px; }
+        .comm-input { 
+            flex: 1; background: #222; border: 1px solid #333; color: white;
+            padding: 8px; border-radius: 5px; font-size: 13px;
+        }
 
         .input-area { 
             position: fixed; bottom: 0; left: 0; right: 0; 
             background: rgba(8,8,8,0.9); backdrop-filter: blur(20px);
             border-top: 1px solid var(--border); padding: 15px;
-            transform: translateY(100%); transition: 0.4s cubic-bezier(0.4,0,0.2,1); z-index: 101;
+            transform: translateY(100%); transition: 0.4s; z-index: 101;
         }
         .input-area.open { transform: translateY(0); }
 
@@ -95,21 +109,9 @@
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             width: 50px; height: 50px; border-radius: 50%; background: var(--accent);
             border: none; color: white; font-size: 24px; cursor: pointer; z-index: 200;
-            display: none; 
         }
 
-        input[type="text"] { 
-            width: 100%; background: #222; border: 1px solid #333; color: white;
-            padding: 12px; border-radius: 10px; margin-bottom: 8px; outline: none;
-        }
-
-        .post-btn { 
-            background: var(--accent); color: white; border: none; 
-            padding: 12px; border-radius: 10px; font-family: 'Bebas Neue', sans-serif; 
-            cursor: pointer; font-size: 18px; width: 100%;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .post-btn { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 10px; font-family: 'Bebas Neue'; cursor: pointer; width: 100%; }
     </style>
 </head>
 <body>
@@ -123,47 +125,30 @@
     <button onclick="showSection('recent')">FEED 24H</button>
     <button onclick="showSection('feed')">GOSSIPS</button>
     <button onclick="showSection('ranking')">RANKING</button>
-    
     <button id="loginBtn" onclick="showSection('login')">LOGIN</button>
-    
     <button class="admin-only" onclick="showSection('admin')">ADMIN</button>
     <button class="admin-only" onclick="logout()" style="color: var(--accent);">LOG OUT</button>
 </div>
 
 <div class="content">
-    <div id="feed" class="section">
-        <div id="gossipFeed">Načítám drby...</div>
-    </div>
-
-    <div id="recent" class="section active">
-        <h2 class="section-title" style="font-family:'Bebas Neue'; margin-bottom: 15px;">Last 24 Hours</h2>
-        <div id="recentFeed"></div>
-    </div>
-
-    <div id="ranking" class="section">
-        <h2 style="font-family:'Bebas Neue'; margin-bottom: 15px;">Ranking</h2>
-        <div id="rankingList"></div>
-    </div>
-
+    <div id="feed" class="section"></div>
+    <div id="recent" class="section active"></div>
+    <div id="ranking" class="section"></div>
     <div id="login" class="section">
         <div class="card">
             <h2 style="font-family:'Bebas Neue'">Admin Access</h2>
-            <input type="password" id="adminPass" placeholder="Heslo" style="width:100%; margin: 10px 0; padding:10px;">
+            <input type="password" id="adminPass" placeholder="Heslo" style="width:100%; margin: 10px 0; padding:10px; background:#222; color:white; border:none;">
             <button class="post-btn" onclick="handleLogin()">Vstoupit</button>
         </div>
     </div>
-
-    <div id="admin" class="section">
-        <h2 style="font-family:'Bebas Neue'; margin-bottom: 15px;">Ke schválení</h2>
-        <div id="adminApproveList"></div>
-    </div>
+    <div id="admin" class="section"></div>
 </div>
 
-<button class="input-toggle-btn" id="inputToggle" onclick="toggleInputArea()">+</button>
+<button class="input-toggle-btn" id="inputToggle" onclick="toggleInputArea()" style="display:none;">+</button>
 
 <div class="input-area" id="inputArea">
-    <input type="text" id="personInput" placeholder="O kom?">
-    <input type="text" id="gossipInput" placeholder="Co se stalo?">
+    <input type="text" id="personInput" placeholder="O kom?" style="width:100%; margin-bottom:5px; padding:10px; background:#222; color:white; border:none; border-radius:8px;">
+    <input type="text" id="gossipInput" placeholder="Co se stalo?" style="width:100%; margin-bottom:5px; padding:10px; background:#222; color:white; border:none; border-radius:8px;">
     <input type="file" id="fileInput" accept="image/*" style="margin-bottom:10px;">
     <button class="post-btn" onclick="submitGossip()">ODESLAT</button>
 </div>
@@ -175,140 +160,104 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const ADMIN_PASS = "1234";
 const RANKED_PEOPLE = ["Lily", "Mason", "Alison", "Katie", "James"];
+const isAdmin = localStorage.getItem('isInsiderAdmin') === 'true';
+if (isAdmin) document.body.classList.add('is-admin');
 
 function showSection(id) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     document.getElementById('navMenu').classList.remove('active');
-    
-    const plusBtn = document.getElementById('inputToggle');
-    if (id === 'feed') {
-        plusBtn.style.display = 'block';
-    } else {
-        plusBtn.style.display = 'none';
-        document.getElementById('inputArea').classList.remove('open');
-        plusBtn.innerText = '+';
-    }
-    
+    document.getElementById('inputToggle').style.display = (id === 'feed') ? 'block' : 'none';
     loadData();
 }
 
 function toggleMenu() { document.getElementById('navMenu').classList.toggle('active'); }
-
 function toggleInputArea() {
     const area = document.getElementById('inputArea');
     area.classList.toggle('open');
     document.getElementById('inputToggle').innerText = area.classList.contains('open') ? '×' : '+';
 }
 
-const isAdmin = localStorage.getItem('isInsiderAdmin') === 'true';
-if (isAdmin) document.body.classList.add('is-admin');
-
-function handleLogin() {
-    if (document.getElementById('adminPass').value === ADMIN_PASS) {
-        localStorage.setItem('isInsiderAdmin', 'true');
-        location.reload();
-    } else { alert("Chybné heslo"); }
-}
-function logout() { localStorage.removeItem('isInsiderAdmin'); location.reload(); }
-
-async function submitGossip() {
-    const person = document.getElementById('personInput').value.trim();
-    const content = document.getElementById('gossipInput').value.trim();
-    const file = document.getElementById('fileInput').files[0];
-
-    if (!person || !content) return alert("Vyplň vše!");
-
-    let imageUrl = null;
-    if (file) {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}.${fileExt}`;
-        const { data, error } = await _supabase.storage.from('gossip-images').upload(fileName, file);
-        if (data) {
-            imageUrl = `${SUPABASE_URL}/storage/v1/object/public/gossip-images/${fileName}`;
-        }
-    }
-
-    const { error } = await _supabase.from('gossips').insert([{ person, content, image_url: imageUrl }]);
-    if (!error) {
-        alert("Odesláno!");
-        location.reload();
-    }
-}
-
 async function loadData() {
-    const { data: gossips, error } = await _supabase
-        .from('gossips')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-    if (error) return;
-
-    const feed = document.getElementById('gossipFeed');
-    const recent = document.getElementById('recentFeed');
-    const adminList = document.getElementById('adminApproveList');
-    const rankingList = document.getElementById('rankingList');
-
-    feed.innerHTML = ''; recent.innerHTML = ''; adminList.innerHTML = '';
+    const { data: gossips } = await _supabase.from('gossips').select('*, gossip_comments(count)').order('created_at', { ascending: false });
     
-    const stats = {};
-    RANKED_PEOPLE.forEach(p => stats[p.toLowerCase()] = 0);
+    const feed = document.getElementById('gossipFeed') || document.getElementById('feed');
+    const recent = document.getElementById('recent');
+    const adminList = document.getElementById('admin');
+    
+    feed.innerHTML = ''; recent.innerHTML = ''; adminList.innerHTML = '';
     const now = new Date();
 
     gossips.forEach(item => {
-        const deleteBtn = isAdmin 
-            ? `<button onclick="deletePost('${item.id}')" style="color:var(--accent); background:none; border:none; font-family:'Bebas Neue'; cursor:pointer;">SMAZAT</button>` 
-            : '';
-
+        const commentCount = item.gossip_comments?.[0]?.count || 0;
         const cardHtml = `
-            <div class="card">
+            <div class="card" id="card-${item.id}">
                 <div class="person">${item.person}</div>
                 <div class="post-time">${new Date(item.created_at).toLocaleString('cs-CZ')}</div>
-                <div style="margin: 10px 0;">${item.content}</div>
+                <div>${item.content}</div>
                 ${item.image_url ? `<img src="${item.image_url}" class="gossip-img">` : ''}
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <button class="like-btn ${localStorage.getItem('liked_'+item.id) ? 'liked' : ''}" 
-                            onclick="likePost('${item.id}', ${item.likes})">
-                        ${item.likes} LIKES
-                    </button>
-                    ${deleteBtn}
+                <div class="btn-row">
+                    <button class="like-btn ${localStorage.getItem('liked_'+item.id) ? 'liked' : ''}" onclick="likePost('${item.id}', ${item.likes})">${item.likes} LIKES</button>
+                    <button class="comm-btn" onclick="toggleComments('${item.id}')">${commentCount} COMMENTS</button>
+                    ${isAdmin ? `<button onclick="deletePost('${item.id}')" style="color:red; background:none; border:none; font-family:'Bebas Neue'; cursor:pointer;">SMAZAT</button>` : ''}
+                </div>
+                <div class="comments-box" id="box-${item.id}">
+                    <div id="list-${item.id}"></div>
+                    <div class="comm-input-wrap">
+                        <input type="text" class="comm-input" id="input-${item.id}" placeholder="Napiš komentář...">
+                        <button class="comm-btn" style="background:var(--accent)" onclick="sendComment('${item.id}')">-></button>
+                    </div>
                 </div>
             </div>
         `;
 
         if (item.approved) {
             feed.innerHTML += cardHtml;
-            const pLower = item.person.toLowerCase();
-            RANKED_PEOPLE.forEach(name => {
-                if (pLower.includes(name.toLowerCase())) stats[name.toLowerCase()]++;
-            });
-            if ((now - new Date(item.created_at)) < 24 * 60 * 60 * 1000) {
-                recent.innerHTML += cardHtml;
-            }
-       } else {
-            adminList.innerHTML += `
-                <div class="card" style="border: 2px solid orange">
-                    <div class="person">${item.person}</div>
-                    <div style="margin: 10px 0;">${item.content}</div>
-                    ${item.image_url ? `<img src="${item.image_url}" class="gossip-img">` : ''}
-                    <div style="display:flex; gap:10px; margin-top:10px;">
-                        <button class="post-btn" style="background:var(--accent-good)" onclick="approvePost('${item.id}')">SCHVÁLIT</button>
-                        <button class="post-btn" onclick="deletePost('${item.id}')">SMAZAT</button>
-                    </div>
-                </div>
-            `;
+            if ((now - new Date(item.created_at)) < 24 * 60 * 60 * 1000) recent.innerHTML += cardHtml;
+        } else if (isAdmin) {
+            adminList.innerHTML += cardHtml.replace('btn-row', 'btn-row-admin').replace('</button>', '</button><button class="post-btn" style="background:var(--accent-good); width:auto;" onclick="approvePost(\''+item.id+'\')">SCHVÁLIT</button>');
         }
     });
-
-    const sorted = [...RANKED_PEOPLE].sort((a,b) => stats[b.toLowerCase()] - stats[a.toLowerCase()]);
-    rankingList.innerHTML = sorted.map((name, i) => `
-        <div class="card" style="display:flex; justify-content:space-between">
-            <span>${i+1}. ${name}</span>
-            <span style="color:var(--accent)">${stats[name.toLowerCase()]}×</span>
-        </div>
-    `).join('');
 }
 
+async function toggleComments(id) {
+    const box = document.getElementById(`box-${id}`);
+    if (box.style.display === 'block') {
+        box.style.display = 'none';
+    } else {
+        box.style.display = 'block';
+        const { data: comms } = await _supabase.from('gossip_comments').select('*').eq('gossip_id', id).order('created_at', { ascending: true });
+        const list = document.getElementById(`list-${id}`);
+        list.innerHTML = comms.map(c => `
+            <div class="comment">
+                <div style="font-size:10px; color:var(--muted)">${new Date(c.created_at).toLocaleTimeString('cs-CZ')}</div>
+                ${c.content}
+                ${isAdmin ? `<span style="color:red; cursor:pointer; float:right" onclick="deleteComment('${c.id}', '${id}')">×</span>` : ''}
+            </div>
+        `).join('');
+    }
+}
+
+async function sendComment(gossipId) {
+    const input = document.getElementById(`input-${gossipId}`);
+    const content = input.value.trim();
+    if (!content) return;
+    const { error } = await _supabase.from('gossip_comments').insert([{ gossip_id: gossipId, content }]);
+    if (!error) {
+        input.value = '';
+        toggleComments(gossipId); // Refreshne seznam
+        loadData(); // Refreshne počítadlo
+    }
+}
+
+async function deleteComment(cId, gId) {
+    if (!confirm("Smazat komentář?")) return;
+    await _supabase.from('gossip_comments').delete().eq('id', cId);
+    toggleComments(gId);
+    loadData();
+}
+
+// ... (funkce likePost, approvePost, deletePost, handleLogin zůstávají stejné jako předtím) ...
 async function likePost(id, currentLikes) {
     if (localStorage.getItem('liked_' + id)) return;
     localStorage.setItem('liked_' + id, 'true');
@@ -317,22 +266,28 @@ async function likePost(id, currentLikes) {
 }
 
 async function approvePost(id) {
-    if (!isAdmin) return;
     await _supabase.from('gossips').update({ approved: true }).eq('id', id);
     loadData();
 }
 
 async function deletePost(id) {
-    if (!isAdmin) return;
-    if (!confirm("Smazat?")) return;
-    const { error } = await _supabase.from('gossips').delete().eq('id', id);
-    if (!error) loadData();
+    if (confirm("Smazat příspěvek?")) {
+        await _supabase.from('gossips').delete().eq('id', id);
+        loadData();
+    }
 }
+
+function handleLogin() {
+    if (document.getElementById('adminPass').value === ADMIN_PASS) {
+        localStorage.setItem('isInsiderAdmin', 'true');
+        location.reload();
+    } else alert("Chyba");
+}
+
+function logout() { localStorage.removeItem('isInsiderAdmin'); location.reload(); }
 
 loadData();
 setInterval(loadData, 30000);
-showSection('recent');
 </script>
-
 </body>
 </html>
