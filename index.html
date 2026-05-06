@@ -308,18 +308,18 @@
 
 <!-- HAMBURGER MENU -->
 <div class="menu" id="navMenu">
-    <button onclick="showSection('feed')">DRBY</button>
+    <button onclick="showSection('feed')">GOSSIPS</button>
     <button onclick="showSection('ranking')">RANKING</button>
-    <button id="loginBtn" onclick="showSection('login')">PRIHLASENI</button>
-    <button class="admin-only" onclick="showSection('admin')">ADMIN PANEL</button>
-    <button class="admin-only" onclick="logout()" style="color: var(--accent);">ODHLASIT</button>
+    <button id="loginBtn" onclick="showSection('login')">LOGIN</button>
+    <button class="admin-only" onclick="showSection('admin')">ADMIN</button>
+    <button class="admin-only" onclick="logout()" style="color: var(--accent);">LOG OUT</button>
 </div>
 
 <!-- HLAVNÍ OBSAH -->
 <div class="content" id="mainContent">
 
     <div id="feed" class="section active">
-        <div id="gossipFeed">Nacitam...</div>
+        <div id="gossipFeed">Loading...</div>
     </div>
 
     <div id="ranking" class="section">
@@ -330,15 +330,15 @@
 
     <div id="login" class="section">
         <div class="card">
-            <h2 style="font-family:'Bebas Neue'; margin-bottom:15px;">VSTUP PRO ADMINY</h2>
-            <input class="login-input" type="text" id="adminUser" placeholder="Uzivatelske jmeno">
-            <input class="login-input" type="password" id="adminPass" placeholder="Heslo">
-            <button class="post-btn" onclick="handleLogin()" style="width: 100%;">PRIHLASIT</button>
+            <h2 style="font-family:'Bebas Neue'; margin-bottom:15px;">ADMIN LOGIN</h2>
+            <input class="login-input" type="text" id="adminUser" placeholder="Username">
+            <input class="login-input" type="password" id="adminPass" placeholder="Password">
+            <button class="post-btn" onclick="handleLogin()" style="width: 100%;">LOG IN</button>
         </div>
     </div>
 
     <div id="admin" class="section admin-only">
-        <h2 style="font-family:'Bebas Neue'; margin-bottom:15px;">ADMIN PANEL</h2>
+        <h2 style="font-family:'Bebas Neue'; margin-bottom:15px;">ADMIN</h2>
         <div class="card">
             <p style="margin-bottom: 10px;">Zmenit docasne pozadi (jen u tebe):</p>
             <input type="file" id="bgUpload" accept="image/*" onchange="uploadBackground()">
@@ -365,8 +365,8 @@
      ============================================= -->
 <div class="input-area" id="inputArea">
     <div class="input-container">
-        <input type="text" id="personInput" placeholder="O kom to je?">
-        <input type="text" id="gossipInput" placeholder="Co se stalo?">
+        <input type="text" id="personInput" placeholder="Who was it about?">
+        <input type="text" id="gossipInput" placeholder="What happend?">
         <div class="type-selector">
             <button class="type-btn selected-gossip" id="btnGossip" onclick="selectType('gossip')">POMLUVA</button>
             <button class="type-btn" id="btnPraise" onclick="selectType('praise')">POCHVALA</button>
@@ -376,7 +376,7 @@
                 FOTO
                 <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="document.getElementById('photoLabel').innerText='FOTO OK'">
             </label>
-            <button class="post-btn" id="postBtn" style="flex:2">POSLAT</button>
+            <button class="post-btn" id="postBtn" style="flex:2">SEND</button>
         </div>
     </div>
 </div>
@@ -422,7 +422,7 @@ window.handleLogin = () => {
     if (u === ADMIN_USER && p === ADMIN_PASS) {
         localStorage.setItem('isAdmin', 'true');
         location.reload();
-    } else { alert("Spatne jmeno nebo heslo!"); }
+    } else { alert("Wrong username or password!"); }
 };
 window.logout = () => { localStorage.removeItem('isAdmin'); location.reload(); };
 
@@ -516,7 +516,7 @@ document.getElementById('postBtn').onclick = async () => {
     const text   = document.getElementById('gossipInput').value.trim();
     const person = document.getElementById('personInput').value.trim();
     const file   = document.getElementById('fileInput').files[0];
-    if (!text || !person) return alert("Vyplň jmeno i drb!");
+    if (!text || !person) return alert("Write name and gossip!");
 
     let base64 = "";
     if (file) {
@@ -533,7 +533,7 @@ document.getElementById('postBtn').onclick = async () => {
         time: new Date().toLocaleString('cs-CZ'),
         approved: false, likes: 0
     });
-    alert("Prispevek byl odeslan ke schvaleni.");
+    alert("The post has been submitted for approval.");
     location.reload();
 };
 
@@ -555,7 +555,7 @@ onValue(gossipRef, (snapshot) => {
     const adminDiv   = document.getElementById('adminApproveList');
 
     feed.innerHTML     = "";
-    adminDiv.innerHTML = "<h3 style='margin:20px 0 10px; font-family:Bebas Neue; color:var(--accent)'>CEKA NA SCHVALENI:</h3>";
+    adminDiv.innerHTML = "<h3 style='margin:20px 0 10px; font-family:Bebas Neue; color:var(--accent)'>Waiting for approval.:</h3>";
 
     // =============================================
     // POČÍTÁNÍ ZMÍNEK PRO RANKING
@@ -598,7 +598,7 @@ onValue(gossipRef, (snapshot) => {
                         <button class="post-btn" style="padding:5px 15px; font-size:14px;" onclick="likePost('${id}', ${likes})">
                             ${likes} likes
                         </button>
-                        ${isAdmin ? `<button onclick="deletePost('${id}')" style="background:none; border:none; color:#555; cursor:pointer; font-size:14px; font-family:'Bebas Neue'">SMAZAT</button>` : ""}
+                        ${isAdmin ? `<button onclick="deletePost('${id}')" style="background:none; border:none; color:#555; cursor:pointer; font-size:14px; font-family:'Bebas Neue'">DELETE</button>` : ""}
                     </div>
                 </div>`;
 
@@ -611,8 +611,8 @@ onValue(gossipRef, (snapshot) => {
                     <b>@${item.person}</b>: ${item.text}
                     ${item.image ? `<img src="${item.image}" class="gossip-img">` : ""}
                     <div style="margin-top:10px; display:flex; gap:10px;">
-                        <button class="post-btn" style="flex:1; background:#28a745; font-size:14px" onclick="approvePost('${id}')">SCHVALIT</button>
-                        <button class="post-btn" style="flex:1; background:#dc3545; font-size:14px" onclick="deletePost('${id}')">SMAZAT</button>
+                        <button class="post-btn" style="flex:1; background:#28a745; font-size:14px" onclick="approvePost('${id}')">APPROVE</button>
+                        <button class="post-btn" style="flex:1; background:#dc3545; font-size:14px" onclick="deletePost('${id}')">DELETE</button>
                     </div>
                 </div>`;
         }
