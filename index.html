@@ -217,18 +217,18 @@
         <div id="recentContent"></div>
     </div>
     <div id="ranking" class="section">
-        <h2 style="font-family:'Bebas Neue'; margin-bottom: 15px;">Ranking</h2>
+        <h2 style="font-family:'Bebas Neue'; margin-bottom: 15px; text-align: center;">Ranking</h2>
         <div id="rankingList"></div>
     </div>
     <div id="login" class="section">
         <div class="card">
-            <h2 style="font-family:'Bebas Neue'">Admin</h2>
+            <h2 style="font-family:'Bebas Neue'; text-align: center;">Admin</h2>
             <input type="password" id="adminPass" placeholder="Heslo" style="width:100%; margin: 10px 0; padding:10px; background:#222; color:white; border:none; border-radius:8px;">
             <button class="post-btn" onclick="handleLogin()">Enter</button>
         </div>
     </div>
     <div id="admin" class="section">
-        <h2 style="font-family:'Bebas Neue'; margin-bottom: 15px;">For approval</h2>
+        <h2 style="font-family:'Bebas Neue'; margin-bottom: 15px;">For approval:</h2>
         <div id="adminContent"></div>
     </div>
 </div>
@@ -340,10 +340,10 @@ function renderGossips(gossips, filter = '') {
                     <div id="${prefix}-list-${item.id}"></div>
                     ${allowWriting ? `
                         <div class="comm-input-wrap">
-                            <input type="text" class="comm-input" id="${prefix}-input-${item.id}" placeholder="Write a comment.">
+                            <input type="text" class="comm-input" id="${prefix}-input-${item.id}" placeholder="Write a comment...">
                             <button class="comm-btn" style="background:var(--accent)" onclick="sendComment('${prefix}', '${item.id}')">-></button>
                         </div>
-                    ` : '<div style="font-size:11px; color:var(--muted); margin-top:10px; text-align:center;">Comments can only be made in the GOSSIPS</div>'}
+                    ` : '<div style="font-size:11px; color:var(--muted); margin-top:10px; text-align:center;">Comments can only be made in the GOSSIPS.</div>'}
                 </div>
             </div>
         `;
@@ -387,7 +387,7 @@ function renderGossips(gossips, filter = '') {
                 </div>
                 <div class="comments-box" id="recent-box-${item.id}">
                     <div id="recent-list-${item.id}"></div>
-                    <div style="font-size:11px; color:var(--muted); margin-top:10px; text-align:center;">Comments can only be made in the GOSSIPS</div>
+                    <div style="font-size:11px; color:var(--muted); margin-top:10px; text-align:center;">Comments can only be made in the GOSSIPS.</div>
                 </div>
             </div>
         `;
